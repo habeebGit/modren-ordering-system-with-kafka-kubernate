@@ -1,0 +1,84 @@
+version: '3.8'
+services:
+  # Kafka setup (zookeeper is a dependency)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+  # PostgreSQL databases for each microservice
+  orders_db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: orders_user
+      POSTGRES_PASSWORD: orders_password
+      POSTGRES_DB: orders_db
+    ports:
+      - "5432:5432"
+  products_db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: products_user
+      POSTGRES_PASSWORD: products_password
+      POSTGRES_DB: products_db
+    ports:
+      - "5433:5432"
+  # Node.js Order Service container
+  order-service:
+    build: ./order-service
+    depends_on:
+      - orders_db
+      - kafka
+    restart: unless-stopped
+    environment:
+      # Inject environment variables for the database connection
+      DB_HOST: orders_db
+      DB_USER: orders_user
+      DB_PASSWORD: orders_password
+      DB_NAME: orders_db
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - "3001:3001" # Expose the port to your host machine
+  # Node.js Product Service container
+  product-service:
+    build: ./product-service
+    depends_on:
+      - products_db
+      - kafka
+    restart: unless-stopped
+    environment:
+      # Inject environment variables for the database connection
+      DB_HOST: products_db
+      DB_USER: products_user
+      DB_PASSWORD: products_password
+      DB_NAME: products_db
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - "3002:3002"
+  # React Frontend container
+  my-ordering-app:
+    build: ./my-ordering-app
+    depends_on:
+      - order-service
+      - product-service
+    ports:
+      - "3000:3000" # Expose the port to your host machine
+    environment:
+      REACT_APP_ORDER_SERVICE_URL: http://order-service:3001
+      REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
+      #REACT_APP_PRODUCT_SERVICE_URL: http://product-service:3002
