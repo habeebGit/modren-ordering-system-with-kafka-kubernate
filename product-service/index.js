@@ -75,7 +75,7 @@ app.get('/test-cors', (req, res) => {
   res.json({ message: 'CORS test' });
 });
 
-// Start service
+// Start service git test
 const start = async () => {
   try {
     await sequelize.sync({ force: true });
