@@ -53,7 +53,7 @@ services:
       DB_NAME: orders_db
       KAFKA_BROKERS: kafka:9092
     ports:
-      - "3001:3001" # Expose the port to your host machine
+      - "3001:3001"
   # Node.js Product Service container
   product-service:
     build: ./product-service
@@ -79,6 +79,7 @@ services:
     ports:
       - "3000:3000" # Expose the port to your host machine
     environment:
-      REACT_APP_ORDER_SERVICE_URL: http://order-service:3001
+      REACT_APP_ORDER_SERVICE_URL: http://localhost:3001
+      #REACT_APP_ORDER_SERVICE_URL: http://order-service:3001
       REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
       #REACT_APP_PRODUCT_SERVICE_URL: http://product-service:3002
