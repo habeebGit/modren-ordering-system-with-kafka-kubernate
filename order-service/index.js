@@ -5,6 +5,8 @@ const { Kafka } = require('kafkajs');
 const axios = require('axios');
 const winston = require('winston');
 const morgan = require('morgan');
+const client = require('prom-client');
+
 const app = express();
 const port = 3001;
 
@@ -60,6 +62,23 @@ const kafka = new Kafka({ brokers: ['kafka:9092'] });
 const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: 'order-service-group' });
 
+// Create a Registry to register the metrics
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
+// Example custom metric
+const httpRequestCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+});
+register.registerMetric(httpRequestCounter);
+
+// Increment counter on each request
+app.use((req, res, next) => {
+  httpRequestCounter.inc();
+  next();
+});
+
 // Order creation endpoint
 app.post('/orders', async (req, res) => {
     const { userId, items } = req.body;
@@ -106,6 +125,12 @@ app.get('/orders', async (req, res) => {
 // Health check endpoint
 app.get('/', (req, res) => {
   res.send('Order Service is running');
+});
+
+// Metrics endpoint
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
 });
 
 // Kafka event sending with retry logic

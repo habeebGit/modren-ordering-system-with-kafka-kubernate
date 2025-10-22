@@ -102,8 +102,22 @@ services:
       - "3000:3000" # Expose the port to your host machine
     environment:
       REACT_APP_ORDER_SERVICE_URL: http://localhost:3001
-      #REACT_APP_ORDER_SERVICE_URL: http://order-service:3001
       REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
+    networks:
+      - ordering-net
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - ordering-net
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3005:3000"
     networks:
       - ordering-net
 
