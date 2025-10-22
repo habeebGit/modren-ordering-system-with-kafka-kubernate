@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
 const { Kafka } = require('kafkajs');
+const axios = require('axios');
 const app = express();
 const port = 3001;
 
@@ -25,6 +26,14 @@ const Order = sequelize.define('Order', {
     status: { type: DataTypes.STRING, defaultValue: 'Pending' }
 });
 
+// Order Item Model
+const OrderItem = sequelize.define('OrderItem', {
+    productId: { type: DataTypes.INTEGER, allowNull: false },
+    quantity: { type: DataTypes.INTEGER, allowNull: false }
+});
+Order.hasMany(OrderItem, { as: 'items' });
+OrderItem.belongsTo(Order);
+
 // Kafka setup
 const kafka = new Kafka({ brokers: ['kafka:9092'] });
 const producer = kafka.producer();
@@ -32,30 +41,41 @@ const producer = kafka.producer();
 // Order creation endpoint
 app.post('/orders', async (req, res) => {
     const { userId, items } = req.body;
+    if (!userId || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: "Invalid order payload." });
+    }
     try {
+        // Validate and decrement stock via product-service
+        const stockRes = await axios.post(
+            process.env.PRODUCT_SERVICE_URL + '/decrement-stock',
+            { items }
+        );
+        if (!stockRes.data.success) throw new Error("Stock update failed");
+
+        // Create order and order items
         const order = await Order.create({ userId });
-        const event = { orderId: order.id, userId, items };
-        
-        await producer.connect();
-        await producer.send({
-            topic: 'order-events',
-            messages: [{ value: JSON.stringify({ type: 'order-created', event }) }]
-        });
-        await producer.disconnect();
+        for (const item of items) {
+            await OrderItem.create({ OrderId: order.id, ...item });
+        }
+
+        // Kafka event (see below for retry)
+        await sendOrderEventWithRetry({ orderId: order.id, userId, items });
 
         res.status(201).json(order);
     } catch (error) {
-        res.status(500).send(error.message);
+        console.error('Order creation error:', error);
+        res.status(400).json({ message: error.message });
     }
 });
 
 // Get all orders endpoint
 app.get('/orders', async (req, res) => {
     try {
-        const orders = await Order.findAll();
+        const orders = await Order.findAll({ include: [{ model: OrderItem, as: 'items' }] });
         res.json(orders);
     } catch (error) {
-        res.status(500).send(error.message);
+        console.error('Fetch orders error:', error);
+        res.status(500).json({ message: error.message });
     }
 });
 
@@ -63,6 +83,28 @@ app.get('/orders', async (req, res) => {
 app.get('/', (req, res) => {
   res.send('Order Service is running');
 });
+
+// Kafka event sending with retry logic
+async function sendOrderEventWithRetry(event, retries = 3) {
+    let attempt = 0;
+    while (attempt < retries) {
+        try {
+            await producer.connect();
+            await producer.send({
+                topic: 'order-events',
+                messages: [{ value: JSON.stringify({ type: 'order-created', event }) }]
+            });
+            await producer.disconnect();
+            return;
+        } catch (err) {
+            attempt++;
+            if (attempt === retries) {
+                console.error('Kafka event failed after retries, sending to dead-letter:', event, err);
+                // Optionally, save to a dead-letter table here
+            }
+        }
+    }
+}
 
 // Start service
 const start = async () => {

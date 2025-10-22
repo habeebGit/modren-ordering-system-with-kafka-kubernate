@@ -52,6 +52,7 @@ services:
       DB_PASSWORD: orders_password
       DB_NAME: orders_db
       KAFKA_BROKERS: kafka:9092
+      PRODUCT_SERVICE_URL: http://product-service:3002
     ports:
       - "3001:3001"
   # Node.js Product Service container
@@ -82,4 +83,3 @@ services:
       REACT_APP_ORDER_SERVICE_URL: http://localhost:3001
       #REACT_APP_ORDER_SERVICE_URL: http://order-service:3001
       REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
-      #REACT_APP_PRODUCT_SERVICE_URL: http://product-service:3002

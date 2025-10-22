@@ -75,6 +75,25 @@ app.get('/test-cors', (req, res) => {
   res.json({ message: 'CORS test' });
 });
 
+app.post('/decrement-stock', async (req, res) => {
+    const { items } = req.body; // [{productId, quantity}]
+    const t = await sequelize.transaction();
+    try {
+        for (const { productId, quantity } of items) {
+            const product = await Product.findByPk(productId, { transaction: t, lock: t.LOCK.UPDATE });
+            if (!product) throw new Error(`Product ${productId} not found`);
+            if (product.stock < quantity) throw new Error(`Insufficient stock for product ${product.name}`);
+            product.stock -= quantity;
+            await product.save({ transaction: t });
+        }
+        await t.commit();
+        res.json({ success: true });
+    } catch (error) {
+        await t.rollback();
+        res.status(400).json({ message: error.message });
+    }
+});
+
 // Start service git test
 const start = async () => {
   try {
@@ -88,4 +107,18 @@ const start = async () => {
   }
 };
 start();
+
+app.post('/decrement-stock', async (req, res) => {
+    const { items } = req.body; // [{productId, quantity}]
+    try {
+        await axios.post(
+            process.env.PRODUCT_SERVICE_URL + '/decrement-stock',
+            { items }
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error decrementing stock:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
