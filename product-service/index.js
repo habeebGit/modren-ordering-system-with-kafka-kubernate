@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const { Sequelize, DataTypes } = require('sequelize');
 const { Kafka } = require('kafkajs');
@@ -77,19 +78,17 @@ app.get('/test-cors', (req, res) => {
 
 app.post('/decrement-stock', async (req, res) => {
     const { items } = req.body; // [{productId, quantity}]
-    const t = await sequelize.transaction();
     try {
         for (const { productId, quantity } of items) {
-            const product = await Product.findByPk(productId, { transaction: t, lock: t.LOCK.UPDATE });
+            const product = await Product.findByPk(productId);
             if (!product) throw new Error(`Product ${productId} not found`);
             if (product.stock < quantity) throw new Error(`Insufficient stock for product ${product.name}`);
             product.stock -= quantity;
-            await product.save({ transaction: t });
+            await product.save();
         }
-        await t.commit();
         res.json({ success: true });
     } catch (error) {
-        await t.rollback();
+        console.error('Error decrementing stock:', error);
         res.status(400).json({ message: error.message });
     }
 });
@@ -97,8 +96,14 @@ app.post('/decrement-stock', async (req, res) => {
 // Start service git test
 const start = async () => {
   try {
-    await sequelize.sync({ force: true });
-    await Product.bulkCreate([{ name: 'Laptop', stock: 100 }, { name: 'Mouse', stock: 250 }]);
+    await sequelize.sync();
+    const count = await Product.count();
+    if (count === 0) {
+      await Product.bulkCreate([
+        { name: 'Laptop', stock: 100 },
+        { name: 'Mouse', stock: 250 }
+      ]);
+    }
     consumeOrderEvents();
     app.listen(port, () => console.log(`Product Service running on port ${port}`));
   } catch (error) {
@@ -108,17 +113,7 @@ const start = async () => {
 };
 start();
 
-app.post('/decrement-stock', async (req, res) => {
-    const { items } = req.body; // [{productId, quantity}]
-    try {
-        await axios.post(
-            process.env.PRODUCT_SERVICE_URL + '/decrement-stock',
-            { items }
-        );
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error decrementing stock:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
 });
 
