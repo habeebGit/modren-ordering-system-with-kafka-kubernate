@@ -8,6 +8,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - ordering-net
   kafka:
     image: confluentinc/cp-kafka:7.0.1
     depends_on:
@@ -20,24 +22,34 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - ordering-net
 
   # PostgreSQL databases for each microservice
   orders_db:
-    image: postgres:13
+    image: postgres:14
     environment:
+      POSTGRES_DB: orders_db
       POSTGRES_USER: orders_user
       POSTGRES_PASSWORD: orders_password
-      POSTGRES_DB: orders_db
     ports:
-      - "5432:5432"
+      - "5434:5432"
+    volumes:
+      - orders_db_data:/var/lib/postgresql/data
+    networks:
+      - ordering-net
   products_db:
-    image: postgres:13
+    image: postgres:14
     environment:
+      POSTGRES_DB: products_db
       POSTGRES_USER: products_user
       POSTGRES_PASSWORD: products_password
-      POSTGRES_DB: products_db
     ports:
       - "5433:5432"
+    volumes:
+      - products_db_data:/var/lib/postgresql/data
+    networks:
+      - ordering-net
   # Node.js Order Service container
   order-service:
     build: ./order-service
@@ -55,6 +67,8 @@ services:
       PRODUCT_SERVICE_URL: http://product-service:3002
     ports:
       - "3001:3001"
+    networks:
+      - ordering-net
   # Node.js Product Service container
   product-service:
     build: ./product-service
@@ -71,6 +85,8 @@ services:
       KAFKA_BROKERS: kafka:9092
     ports:
       - "3002:3002"
+    networks:
+      - ordering-net
   # React Frontend container
   my-ordering-app:
     build: ./my-ordering-app
@@ -83,3 +99,13 @@ services:
       REACT_APP_ORDER_SERVICE_URL: http://localhost:3001
       #REACT_APP_ORDER_SERVICE_URL: http://order-service:3001
       REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
+    networks:
+      - ordering-net
+
+volumes:
+  products_db_data:
+  orders_db_data:
+
+networks:
+  ordering-net:
+    driver: bridge
