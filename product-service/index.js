@@ -50,6 +50,9 @@ const consumeOrderEvents = async () => {
                         product.stock -= item.quantity;
                         await product.save();
                         console.log(`Deducted stock for product ${item.productId}`);
+                        logger.info('Order created', { orderId: order.id });
+                    } else {
+                        logger.error('Order creation failed', { error: 'Insufficient stock' });
                     }
                 }
             }
