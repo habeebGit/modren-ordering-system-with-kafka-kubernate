@@ -115,3 +115,9 @@ const start = async () => {
 };
 start();
 
+module.exports = app;
+
+if (require.main === module) {
+  app.listen(port, () => console.log(`Order Service running on port ${port}`));
+}
+

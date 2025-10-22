@@ -29,9 +29,9 @@ services:
   orders_db:
     image: postgres:14
     environment:
-      POSTGRES_DB: orders_db
-      POSTGRES_USER: orders_user
-      POSTGRES_PASSWORD: orders_password
+      POSTGRES_DB: ${ORDERS_POSTGRES_DB}
+      POSTGRES_USER: ${ORDERS_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ORDERS_POSTGRES_PASSWORD}
     ports:
       - "5434:5432"
     volumes:
@@ -41,9 +41,9 @@ services:
   products_db:
     image: postgres:14
     environment:
-      POSTGRES_DB: products_db
-      POSTGRES_USER: products_user
-      POSTGRES_PASSWORD: products_password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
@@ -60,11 +60,11 @@ services:
     environment:
       # Inject environment variables for the database connection
       DB_HOST: orders_db
-      DB_USER: orders_user
-      DB_PASSWORD: orders_password
-      DB_NAME: orders_db
-      KAFKA_BROKERS: kafka:9092
-      PRODUCT_SERVICE_URL: http://product-service:3002
+      DB_USER: ${ORDERS_POSTGRES_USER}
+      DB_PASSWORD: ${ORDERS_POSTGRES_PASSWORD}
+      DB_NAME: ${ORDERS_POSTGRES_DB}
+      KAFKA_BROKERS: ${KAFKA_BROKERS}
+      PRODUCT_SERVICE_URL: ${PRODUCT_SERVICE_URL}
     ports:
       - "3001:3001"
     networks:
@@ -79,14 +79,19 @@ services:
     environment:
       # Inject environment variables for the database connection
       DB_HOST: products_db
-      DB_USER: products_user
-      DB_PASSWORD: products_password
-      DB_NAME: products_db
-      KAFKA_BROKERS: kafka:9092
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      KAFKA_BROKERS: ${KAFKA_BROKERS}
     ports:
       - "3002:3002"
     networks:
       - ordering-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   # React Frontend container
   my-ordering-app:
     build: ./my-ordering-app
