@@ -29,69 +29,87 @@ services:
   orders_db:
     image: postgres:14
     environment:
-      POSTGRES_DB: ${ORDERS_POSTGRES_DB}
-      POSTGRES_USER: ${ORDERS_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${ORDERS_POSTGRES_PASSWORD}
+      POSTGRES_DB: orders_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
     ports:
-      - "5434:5432"
+      - "5433:5432"  # Changed port to avoid conflicts
     volumes:
-      - orders_db_data:/var/lib/postgresql/data
+      - orders_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - ordering-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d orders_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
   products_db:
     image: postgres:14
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: products_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
     ports:
-      - "5433:5432"
+      - "5434:5432"  # Different port for products DB
     volumes:
-      - products_db_data:/var/lib/postgresql/data
+      - products_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - ordering-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d products_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
   # Node.js Order Service container
   order-service:
     build: ./order-service
     depends_on:
-      - orders_db
-      - kafka
-    restart: unless-stopped
-    environment:
-      # Inject environment variables for the database connection
-      DB_HOST: orders_db
-      DB_USER: ${ORDERS_POSTGRES_USER}
-      DB_PASSWORD: ${ORDERS_POSTGRES_PASSWORD}
-      DB_NAME: ${ORDERS_POSTGRES_DB}
-      KAFKA_BROKERS: ${KAFKA_BROKERS}
-      PRODUCT_SERVICE_URL: ${PRODUCT_SERVICE_URL}
+      orders_db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     ports:
       - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_HOST: orders_db
+      DB_PORT: 5432
+      DB_NAME: orders_db
+      DB_USER: postgres
+      DB_PASSWORD: password
+      KAFKA_BROKERS: kafka:9092
     networks:
       - ordering-net
+    restart: unless-stopped
   # Node.js Product Service container
   product-service:
     build: ./product-service
     depends_on:
-      - products_db
-      - kafka
-    restart: unless-stopped
-    environment:
-      # Inject environment variables for the database connection
-      DB_HOST: products_db
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_NAME: ${POSTGRES_DB}
-      KAFKA_BROKERS: ${KAFKA_BROKERS}
+      products_db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     ports:
       - "3002:3002"
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      DB_HOST: products_db
+      DB_PORT: 5432
+      DB_NAME: products_db
+      DB_USER: postgres
+      DB_PASSWORD: password
+      KAFKA_BROKERS: kafka:9092
     networks:
       - ordering-net
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    restart: unless-stopped
   # React Frontend container
   my-ordering-app:
     build: ./my-ordering-app
@@ -99,12 +117,18 @@ services:
       - order-service
       - product-service
     ports:
-      - "3000:3000" # Expose the port to your host machine
+      - "3000:3000"
     environment:
       REACT_APP_ORDER_SERVICE_URL: http://localhost:3001
       REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./my-ordering-app/src:/app/src
+      - ./my-ordering-app/public:/app/public
     networks:
       - ordering-net
+    stdin_open: true
+    tty: true
   prometheus:
     image: prom/prometheus
     volumes:
@@ -122,9 +146,13 @@ services:
       - ordering-net
 
 volumes:
-  products_db_data:
-  orders_db_data:
+  orders_data:
+  products_data:
+  prometheus_data:
+  grafana_data:
 
 networks:
   ordering-net:
     driver: bridge
+
+

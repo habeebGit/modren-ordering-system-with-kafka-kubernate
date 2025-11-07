@@ -57,6 +57,13 @@ const OrderItem = sequelize.define('OrderItem', {
 Order.hasMany(OrderItem, { as: 'items' });
 OrderItem.belongsTo(Order);
 
+// Processed Event Model for idempotency
+const ProcessedEvent = sequelize.define('ProcessedEvent', {
+    id: { type: DataTypes.STRING, primaryKey: true },
+    eventType: { type: DataTypes.STRING, allowNull: false },
+    processedAt: { type: DataTypes.DATE, allowNull: false }
+});
+
 // Kafka setup
 const kafka = new Kafka({ brokers: ['kafka:9092'] });
 const producer = kafka.producer();
@@ -79,35 +86,92 @@ app.use((req, res, next) => {
   next();
 });
 
-// Order creation endpoint
+// Order creation endpoint with proper transaction handling
 app.post('/orders', async (req, res) => {
     const { userId, items } = req.body;
     if (!userId || !Array.isArray(items) || items.length === 0) {
         return res.status(400).json({ message: "Invalid order payload." });
     }
-    try {
-        // Validate and decrement stock via product-service
-        const stockRes = await axios.post(
-            process.env.PRODUCT_SERVICE_URL + '/decrement-stock',
-            { items }
-        );
-        if (!stockRes.data.success) throw new Error("Stock update failed");
 
-        // Create order and order items
-        const order = await Order.create({ userId });
-        for (const item of items) {
-            await OrderItem.create({ OrderId: order.id, ...item });
+    const transaction = await sequelize.transaction();
+    try {
+        // Step 1: Create order in PENDING status first
+        const order = await Order.create({ 
+            userId, 
+            status: 'PENDING' 
+        }, { transaction });
+
+        // Step 2: Create order items
+        const orderItems = await Promise.all(
+            items.map(item => 
+                OrderItem.create({ 
+                    OrderId: order.id, 
+                    productId: item.productId,
+                    quantity: item.quantity 
+                }, { transaction })
+            )
+        );
+
+        // Step 3: Send reservation request to product service (not immediate decrement)
+        const reservationRes = await axios.post(
+            process.env.PRODUCT_SERVICE_URL + '/reserve-stock',
+            { 
+                orderId: order.id,
+                items: items.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity
+                }))
+            }
+        );
+
+        if (!reservationRes.data.success) {
+            throw new Error(reservationRes.data.message || "Stock reservation failed");
         }
 
-        logger.info('Order created', { orderId: order.id });
+        // Step 4: Update order status to CONFIRMED
+        await order.update({ status: 'CONFIRMED' }, { transaction });
 
-        // Kafka event (see below for retry)
-        await sendOrderEventWithRetry({ orderId: order.id, userId, items });
+        // Step 5: Commit transaction
+        await transaction.commit();
 
-        res.status(201).json(order);
+        logger.info('Order created successfully', { 
+            orderId: order.id, 
+            userId, 
+            items: items.length 
+        });
+
+        // Step 6: Send order created event (async, after transaction commit)
+        setImmediate(async () => {
+            await sendOrderEventWithRetry({ 
+                orderId: order.id, 
+                userId, 
+                items,
+                eventType: 'ORDER_CREATED',
+                timestamp: new Date().toISOString()
+            });
+        });
+
+        // Return order with items
+        const completeOrder = await Order.findByPk(order.id, {
+            include: [{ model: OrderItem, as: 'items' }]
+        });
+
+        res.status(201).json(completeOrder);
     } catch (error) {
-        logger.error('Order creation error', { error: error.message, stack: error.stack });
-        res.status(400).json({ message: error.message });
+        // Rollback transaction on any error
+        await transaction.rollback();
+        
+        logger.error('Order creation error', { 
+            error: error.message, 
+            stack: error.stack,
+            userId,
+            items 
+        });
+        
+        res.status(400).json({ 
+            message: error.message,
+            code: 'ORDER_CREATION_FAILED'
+        });
     }
 });
 
@@ -133,47 +197,121 @@ app.get('/metrics', async (req, res) => {
   res.end(await register.metrics());
 });
 
-// Kafka event sending with retry logic
+// Kafka event sending with retry logic and proper message ID
 async function sendOrderEventWithRetry(event, retries = 3) {
+    const messageId = `${event.eventType}-${event.orderId}-${Date.now()}`;
     let attempt = 0;
+    
     while (attempt < retries) {
         try {
             await producer.connect();
             await producer.send({
                 topic: 'order-events',
-                messages: [{ value: JSON.stringify({ type: 'order-created', event }) }]
+                messages: [{ 
+                    key: event.orderId.toString(),
+                    value: JSON.stringify({ 
+                        messageId,
+                        eventType: event.eventType,
+                        event,
+                        timestamp: new Date().toISOString()
+                    }) 
+                }]
             });
             await producer.disconnect();
+            logger.info('Event sent successfully', { messageId, eventType: event.eventType });
             return;
         } catch (err) {
             attempt++;
+            logger.warn(`Event send attempt ${attempt} failed`, { messageId, error: err.message });
             if (attempt === retries) {
-                logger.error('Kafka event failed after retries, sending to dead-letter:', event, err);
-                // Optionally, save to a dead-letter table here
+                logger.error('Kafka event failed after retries, saving to dead-letter', { 
+                    messageId, 
+                    event, 
+                    error: err.message 
+                });
+                // Save to dead-letter table for manual processing
+                await saveToDeadLetter(messageId, event, err.message);
             }
         }
     }
 }
 
-// Kafka consumer for order events
+// Handle stock reservation failure
+async function handleStockReservationFailure(orderId) {
+    const transaction = await sequelize.transaction();
+    try {
+        const order = await Order.findByPk(orderId, { transaction });
+        if (order) {
+            await order.update({ status: 'CANCELLED' }, { transaction });
+            await transaction.commit();
+            logger.info('Order cancelled due to stock reservation failure', { orderId });
+        }
+    } catch (error) {
+        await transaction.rollback();
+        logger.error('Error cancelling order', { orderId, error: error.message });
+    }
+}
+
+// Save failed events to dead letter table
+async function saveToDeadLetter(messageId, event, errorMessage) {
+    try {
+        // You can create a DeadLetterEvent model for this
+        logger.error('Saving to dead letter queue', { messageId, event, errorMessage });
+        // TODO: Implement proper dead letter storage
+    } catch (error) {
+        logger.error('Failed to save to dead letter queue', { error: error.message });
+    }
+}
+
+// Kafka consumer for order events (removed stock logic - handled by product service)
 const consumeOrderEvents = async () => {
     await consumer.connect();
     await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
     await consumer.run({
         eachMessage: async ({ message }) => {
-            const { type, event } = JSON.parse(message.value.toString());
-            if (type === 'order-created') {
-                for (const item of event.items) {
-                    const product = await Product.findByPk(item.productId);
-                    if (product && product.stock >= item.quantity) {
-                        product.stock -= item.quantity;
-                        await product.save();
-                        logger.info(`Deducted stock for product ${item.productId}`);
-                        logger.info('Order created', { orderId: event.orderId });
-                    } else {
-                        logger.error('Order creation failed', { error: 'Insufficient stock', productId: item.productId });
-                    }
+            try {
+                const { eventType, event, messageId } = JSON.parse(message.value.toString());
+                
+                // Implement idempotency check
+                const processedEvent = await ProcessedEvent.findByPk(messageId);
+                if (processedEvent) {
+                    logger.info('Event already processed, skipping', { messageId, eventType });
+                    return;
                 }
+
+                switch (eventType) {
+                    case 'STOCK_RESERVED':
+                        logger.info('Stock reserved for order', { 
+                            orderId: event.orderId,
+                            items: event.items.length 
+                        });
+                        break;
+                    
+                    case 'STOCK_RESERVATION_FAILED':
+                        // Handle failed stock reservation - cancel the order
+                        await handleStockReservationFailure(event.orderId);
+                        break;
+                    
+                    case 'ORDER_CANCELLED':
+                        logger.info('Order cancelled event received', { orderId: event.orderId });
+                        break;
+                        
+                    default:
+                        logger.warn('Unknown event type received', { eventType, event });
+                }
+
+                // Mark event as processed
+                await ProcessedEvent.create({ 
+                    id: messageId, 
+                    eventType, 
+                    processedAt: new Date() 
+                });
+
+            } catch (error) {
+                logger.error('Error processing order event', { 
+                    error: error.message, 
+                    stack: error.stack 
+                });
             }
         },
     });
@@ -190,28 +328,52 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
-// Decrement stock endpoint
-app.post('/decrement-stock', async (req, res) => {
-    const { items } = req.body;
+// Order cancellation endpoint
+app.post('/orders/:orderId/cancel', async (req, res) => {
+    const { orderId } = req.params;
+    const transaction = await sequelize.transaction();
+    
     try {
-        for (const { productId, quantity } of items) {
-            const product = await Product.findByPk(productId);
-            if (!product) throw new Error(`Product ${productId} not found`);
-            if (product.stock < quantity) throw new Error(`Insufficient stock for product ${product.name}`);
-            product.stock -= quantity;
-            await product.save();
+        const order = await Order.findByPk(orderId, {
+            include: [{ model: OrderItem, as: 'items' }],
+            transaction
+        });
+        
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
         }
-        logger.info('Stock decremented', { items });
-        res.json({ success: true });
+        
+        if (order.status === 'CANCELLED') {
+            return res.status(400).json({ message: 'Order already cancelled' });
+        }
+        
+        // Update order status
+        await order.update({ status: 'CANCELLED' }, { transaction });
+        await transaction.commit();
+        
+        // Send cancellation event to release stock
+        await sendOrderEventWithRetry({
+            eventType: 'ORDER_CANCELLED',
+            orderId: order.id,
+            items: order.items.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity
+            }))
+        });
+        
+        logger.info('Order cancelled successfully', { orderId });
+        res.json({ success: true, message: 'Order cancelled successfully' });
+        
     } catch (error) {
-        logger.error('Error decrementing stock', { error: error.message, items });
-        res.status(400).json({ message: error.message });
+        await transaction.rollback();
+        logger.error('Error cancelling order', { orderId, error: error.message });
+        res.status(500).json({ message: error.message });
     }
 });
 
 // Start service
 const start = async () => {
-    await sequelize.sync();
+    await sequelize.sync({ alter: true }); // This will add missing columns
     consumeOrderEvents(); // Start the Kafka consumer
     app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
