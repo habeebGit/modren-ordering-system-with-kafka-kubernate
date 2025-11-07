@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { Sequelize, DataTypes } = require('sequelize');
 const { Kafka } = require('kafkajs');
 const axios = require('axios');
@@ -7,11 +9,61 @@ const winston = require('winston');
 const morgan = require('morgan');
 const client = require('prom-client');
 
+// Import validation middleware
+const {
+  sanitizeInput,
+  validateSchema,
+  validationRules,
+  handleValidationErrors,
+  securityMiddleware,
+  schemas
+} = require('./middleware/validation');
+
 const app = express();
 const port = 3001;
 
-app.use(cors());
-app.use(express.json());
+// Security middleware
+app.use(helmet());
+app.use(securityMiddleware);
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again later'
+  }
+});
+app.use(limiter);
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['http://localhost:3000'] // Add your production domains
+    : true,
+  credentials: true
+}));
+
+// Body parsing with size limits
+app.use(express.json({ 
+  limit: '10mb',
+  verify: (req, res, buf) => {
+    try {
+      JSON.parse(buf);
+    } catch (e) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid JSON payload'
+      });
+      throw new Error('Invalid JSON');
+    }
+  }
+}));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Input sanitization middleware (apply to all routes)
+app.use(sanitizeInput);
 
 // Winston logger setup
 const logger = winston.createLogger({
@@ -86,13 +138,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Order creation endpoint with proper transaction handling
-app.post('/orders', async (req, res) => {
+// Order creation endpoint with proper validation and transaction handling
+app.post('/orders', 
+  validationRules.createOrder,
+  handleValidationErrors,
+  validateSchema(schemas.createOrder),
+  async (req, res) => {
     const { userId, items } = req.body;
-    if (!userId || !Array.isArray(items) || items.length === 0) {
-        return res.status(400).json({ message: "Invalid order payload." });
-    }
-
+    
     const transaction = await sequelize.transaction();
     try {
         // Step 1: Create order in PENDING status first
@@ -175,14 +228,120 @@ app.post('/orders', async (req, res) => {
     }
 });
 
-// Get all orders endpoint
-app.get('/orders', async (req, res) => {
+// Get all orders endpoint with pagination and filtering
+app.get('/orders', 
+  validationRules.getOrders,
+  handleValidationErrors,
+  validateSchema(schemas.pagination, 'query'),
+  async (req, res) => {
     try {
-        const orders = await Order.findAll({ include: [{ model: OrderItem, as: 'items' }] });
-        res.json(orders);
+        const { page, limit, sortBy, sortOrder } = req.query;
+        const offset = (page - 1) * limit;
+        
+        const orders = await Order.findAndCountAll({
+            include: [{ model: OrderItem, as: 'items' }],
+            limit: parseInt(limit),
+            offset: parseInt(offset),
+            order: [[sortBy, sortOrder]]
+        });
+        
+        res.json({
+            success: true,
+            data: {
+                orders: orders.rows,
+                pagination: {
+                    currentPage: page,
+                    totalPages: Math.ceil(orders.count / limit),
+                    totalItems: orders.count,
+                    itemsPerPage: limit
+                }
+            }
+        });
     } catch (error) {
         logger.error('Fetch orders error:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to fetch orders',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+// Get order by ID endpoint
+app.get('/orders/:id', 
+  validationRules.getOrderById,
+  handleValidationErrors,
+  validateSchema(schemas.orderId, 'params'),
+  async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await Order.findByPk(id, {
+            include: [{ model: OrderItem, as: 'items' }]
+        });
+        
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            data: order
+        });
+    } catch (error) {
+        logger.error('Fetch order by ID error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to fetch order',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+// Update order status endpoint
+app.put('/orders/:id/status', 
+  validationRules.updateOrderStatus,
+  handleValidationErrors,
+  validateSchema(schemas.updateOrderStatus),
+  async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        
+        const order = await Order.findByPk(id);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+        
+        await order.update({ status });
+        
+        // Send order status updated event
+        setImmediate(async () => {
+            await sendOrderEventWithRetry({
+                orderId: order.id,
+                eventType: 'ORDER_STATUS_UPDATED',
+                status: status,
+                previousStatus: order.status
+            });
+        });
+        
+        res.json({
+            success: true,
+            data: order,
+            message: `Order status updated to ${status}`
+        });
+    } catch (error) {
+        logger.error('Update order status error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to update order status',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 
@@ -371,13 +530,35 @@ app.post('/orders/:orderId/cancel', async (req, res) => {
     }
 });
 
+// Import error handling middleware
+const {
+  globalErrorHandler,
+  notFoundHandler,
+  setupGracefulShutdown,
+  asyncHandler
+} = require('./middleware/errorHandler');
+
+// Apply error handling middleware after all routes
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
+
 // Start service
 const start = async () => {
-    await sequelize.sync({ alter: true }); // This will add missing columns
-    consumeOrderEvents(); // Start the Kafka consumer
-    app.listen(port, () => {
-        console.log(`Server is running on port ${port}`);
-    });
+    try {
+        await sequelize.sync({ alter: true }); // This will add missing columns
+        consumeOrderEvents(); // Start the Kafka consumer
+        
+        const server = app.listen(port, () => {
+            logger.info(`Order Service is running on port ${port}`);
+        });
+        
+        // Setup graceful shutdown
+        setupGracefulShutdown(server);
+        
+    } catch (error) {
+        logger.error('Failed to start order service', { error: error.message });
+        process.exit(1);
+    }
 };
 start();
 

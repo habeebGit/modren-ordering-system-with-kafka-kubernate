@@ -1,15 +1,26 @@
 import React from 'react';
 
 const ProductCard = ({ product, onAddToCart }) => {
-  const isOutOfStock = !product.stock || product.stock <= 0;
+  // Use availableStock if available, fallback to totalStock, then stock
+  const stockAmount = product.availableStock ?? product.totalStock ?? product.stock ?? 0;
+  const isOutOfStock = stockAmount <= 0;
+  
+  // Convert price to number and format it
+  const formatPrice = (price) => {
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    return isNaN(numPrice) ? '0.00' : numPrice.toFixed(2);
+  };
 
   return (
     <div className="product-card">
       <div className="product-info">
         <h3>{product.name}</h3>
-        <p className="price">${product.price?.toFixed(2)}</p>
+        {product.description && (
+          <p className="description">{product.description}</p>
+        )}
+        <p className="price">${formatPrice(product.price)}</p>
         <p className={`stock ${isOutOfStock ? 'out-of-stock' : ''}`}>
-          {isOutOfStock ? '❌ Out of Stock' : `✅ In Stock: ${product.stock}`}
+          {isOutOfStock ? '❌ Out of Stock' : `✅ In Stock: ${stockAmount}`}
         </p>
       </div>
       <button

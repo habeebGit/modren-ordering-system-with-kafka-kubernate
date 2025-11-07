@@ -85,6 +85,8 @@ services:
       DB_USER: postgres
       DB_PASSWORD: password
       KAFKA_BROKERS: kafka:9092
+      PRODUCT_SERVICE_URL: http://product-service:3002
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3003
     networks:
       - ordering-net
     restart: unless-stopped
@@ -107,24 +109,45 @@ services:
       DB_USER: postgres
       DB_PASSWORD: password
       KAFKA_BROKERS: kafka:9092
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3003
     networks:
       - ordering-net
     restart: unless-stopped
-  # React Frontend container
-  my-ordering-app:
-    build: ./my-ordering-app
+    
+  # API Gateway container
+  api-gateway:
+    build: ./api-gateway
     depends_on:
       - order-service
       - product-service
     ports:
+      - "3003:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      ORDER_SERVICE_URL: http://order-service:3001
+      PRODUCT_SERVICE_URL: http://product-service:3002
+      CORS_ORIGINS: http://localhost:3000
+      RATE_LIMIT_MAX: 100
+      RATE_LIMIT_WINDOW_MS: 900000
+    networks:
+      - ordering-net
+    restart: unless-stopped
+  # React Frontend container
+  my-orderings-app:
+    build: ./my-orderings-app
+    depends_on:
+      - api-gateway
+    ports:
       - "3000:3000"
     environment:
+      REACT_APP_API_URL: http://localhost:3003
       REACT_APP_ORDER_SERVICE_URL: http://localhost:3001
       REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
       CHOKIDAR_USEPOLLING: "true"
     volumes:
-      - ./my-ordering-app/src:/app/src
-      - ./my-ordering-app/public:/app/public
+      - ./my-orderings-app/src:/app/src
+      - ./my-orderings-app/public:/app/public
     networks:
       - ordering-net
     stdin_open: true

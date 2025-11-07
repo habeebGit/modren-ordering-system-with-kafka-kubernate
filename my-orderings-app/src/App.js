@@ -22,10 +22,10 @@ function App() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      // Try the container network first, then fallback to localhost
+      // Use API gateway instead of direct service calls
       const urls = [
-        'http://product-service:3002/products',  // Container network
-        'http://localhost:3002/products'        // Host network
+        'http://api-gateway:3003/api/products',  // Container network
+        'http://localhost:3003/api/products'    // Host network
       ];
       
       let response;
@@ -41,7 +41,13 @@ function App() {
       if (response && response.ok) {
         const data = await response.json();
         console.log('Products fetched:', data);
-        setProducts(data);
+        // Extract products from the API response structure
+        if (data.success && data.data && data.data.products) {
+          setProducts(data.data.products);
+        } else {
+          // Handle old response format or direct products array
+          setProducts(Array.isArray(data) ? data : []);
+        }
       } else {
         throw new Error('All API endpoints failed');
       }

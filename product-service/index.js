@@ -1,14 +1,67 @@
 require('dotenv').config();
 const express = require('express');
-const { Sequelize, DataTypes } = require('sequelize');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const { Sequelize, DataTypes, Op } = require('sequelize');
 const { Kafka } = require('kafkajs');
 const axios = require('axios');
 const cors = require('cors');
+
+// Import validation middleware
+const {
+  sanitizeInput,
+  validateSchema,
+  validationRules,
+  handleValidationErrors,
+  securityMiddleware,
+  schemas
+} = require('./middleware/validation');
+
 const app = express();
 const port = 3002;
 
-app.use(cors());
-app.use(express.json());
+// Security middleware
+app.use(helmet());
+app.use(securityMiddleware);
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again later'
+  }
+});
+app.use(limiter);
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['http://localhost:3000'] // Add your production domains
+    : true,
+  credentials: true
+}));
+
+// Body parsing with size limits
+app.use(express.json({ 
+  limit: '10mb',
+  verify: (req, res, buf) => {
+    try {
+      JSON.parse(buf);
+    } catch (e) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid JSON payload'
+      });
+      throw new Error('Invalid JSON');
+    }
+  }
+}));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Input sanitization middleware (apply to all routes)
+app.use(sanitizeInput);
 
 // Database connection
 const sequelize = new Sequelize(
@@ -24,7 +77,10 @@ const sequelize = new Sequelize(
 // Product Model with proper stock management
 const Product = sequelize.define('Product', {
     name: { type: DataTypes.STRING, allowNull: false },
+    price: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
     stock: { type: DataTypes.INTEGER, defaultValue: 0 },
+    category: { type: DataTypes.STRING, allowNull: true },
+    description: { type: DataTypes.TEXT, allowNull: true },
     reservedStock: { type: DataTypes.INTEGER, defaultValue: 0 }, // Track reserved stock
     version: { type: DataTypes.INTEGER, defaultValue: 1 } // For optimistic locking
 });
@@ -203,26 +259,209 @@ async function confirmStockForOrder(orderId) {
     }
 }
 
-app.get('/products', async (req, res) => {
-  try {
-    const products = await Product.findAll();
-    
-    // Calculate available stock (total - reserved)
-    const productsWithAvailableStock = products.map(product => ({
-      id: product.id,
-      name: product.name,
-      totalStock: product.stock,
-      reservedStock: product.reservedStock,
-      availableStock: product.stock - product.reservedStock,
-      createdAt: product.createdAt,
-      updatedAt: product.updatedAt
-    }));
-    
-    res.json(productsWithAvailableStock);
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ message: 'Error fetching products' });
-  }
+// Get all products with filtering and pagination
+app.get('/products', 
+  validationRules.getProducts,
+  handleValidationErrors,
+  validateSchema(schemas.pagination, 'query'),
+  async (req, res) => {
+    try {
+      const { 
+        page = 1, 
+        limit = 10, 
+        sortBy = 'createdAt', 
+        sortOrder = 'DESC', 
+        category, 
+        minPrice, 
+        maxPrice 
+      } = req.query;
+      const offset = (page - 1) * limit;
+      
+      // Build where clause for filtering
+      const whereClause = {};
+      if (category) {
+        whereClause.category = category;
+      }
+      if (minPrice !== undefined || maxPrice !== undefined) {
+        whereClause.price = {};
+        if (minPrice !== undefined) {
+          whereClause.price[Op.gte] = minPrice;
+        }
+        if (maxPrice !== undefined) {
+          whereClause.price[Op.lte] = maxPrice;
+        }
+      }
+      
+      const products = await Product.findAndCountAll({
+        where: whereClause,
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        order: [[sortBy, sortOrder]]
+      });
+      
+      // Calculate available stock (total - reserved)
+      const productsWithAvailableStock = products.rows.map(product => ({
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        category: product.category,
+        sku: product.sku,
+        totalStock: product.stock,
+        reservedStock: product.reservedStock,
+        availableStock: product.stock - product.reservedStock,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
+      }));
+      
+      res.json({
+        success: true,
+        data: {
+          products: productsWithAvailableStock,
+          pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(products.count / limit),
+            totalItems: products.count,
+            itemsPerPage: limit
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to fetch products',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+});
+
+// Get product by ID
+app.get('/products/:id', 
+  validationRules.getProductById,
+  handleValidationErrors,
+  validateSchema(schemas.productId, 'params'),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const product = await Product.findByPk(id);
+      
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: 'Product not found'
+        });
+      }
+      
+      res.json({
+        success: true,
+        data: {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          category: product.category,
+          sku: product.sku,
+          totalStock: product.stock,
+          reservedStock: product.reservedStock,
+          availableStock: product.stock - product.reservedStock,
+          createdAt: product.createdAt,
+          updatedAt: product.updatedAt
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to fetch product',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+});
+
+// Create new product
+app.post('/products', 
+  validationRules.createProduct,
+  handleValidationErrors,
+  validateSchema(schemas.createProduct),
+  async (req, res) => {
+    try {
+      const productData = req.body;
+      
+      // Check for duplicate SKU if provided
+      if (productData.sku) {
+        const existingProduct = await Product.findOne({ 
+          where: { sku: productData.sku } 
+        });
+        if (existingProduct) {
+          return res.status(409).json({
+            success: false,
+            message: 'Product with this SKU already exists'
+          });
+        }
+      }
+      
+      const product = await Product.create(productData);
+      res.status(201).json({
+        success: true,
+        data: product,
+        message: 'Product created successfully'
+      });
+    } catch (error) {
+      console.error('Error creating product:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to create product',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+});
+
+// Update product
+app.put('/products/:id', 
+  validationRules.updateProduct,
+  handleValidationErrors,
+  validateSchema(schemas.updateProduct),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      
+      const product = await Product.findByPk(id);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: 'Product not found'
+        });
+      }
+      
+      // Check for duplicate SKU if provided
+      if (updateData.sku && updateData.sku !== product.sku) {
+        const existingProduct = await Product.findOne({ 
+          where: { sku: updateData.sku } 
+        });
+        if (existingProduct) {
+          return res.status(409).json({
+            success: false,
+            message: 'Product with this SKU already exists'
+          });
+        }
+      }
+      
+      await product.update(updateData);
+      res.json({
+        success: true,
+        data: product,
+        message: 'Product updated successfully'
+      });
+    } catch (error) {
+      console.error('Error updating product:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to update product',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
 });
 
 app.get('/external-products', async (req, res) => {
@@ -239,8 +478,10 @@ app.get('/test-cors', (req, res) => {
   res.json({ message: 'CORS test' });
 });
 
-// Stock reservation endpoint (replaces decrement-stock)
-app.post('/reserve-stock', async (req, res) => {
+// Stock reservation endpoint with validation
+app.post('/reserve-stock', 
+  validateSchema(schemas.reserveStock),
+  async (req, res) => {
     const { orderId, items } = req.body; // {orderId, items: [{productId, quantity}]}
     const transaction = await sequelize.transaction();
     
@@ -408,7 +649,7 @@ async function cleanupExpiredReservations() {
         const expiredReservations = await StockReservation.findAll({
             where: {
                 status: 'RESERVED',
-                expiresAt: { [sequelize.Op.lt]: new Date() }
+                expiresAt: { [Op.lt]: new Date() }
             },
             include: [Product]
         });
@@ -451,13 +692,32 @@ const startKafkaConsumer = async () => {
   }
   
   try {
-    await consumeOrderEvents();
-    console.log('Kafka consumer started successfully');
+    // Kafka consumer implementation would go here
+    console.log('Kafka consumer started');
   } catch (error) {
     console.error('Error starting Kafka consumer:', error);
-    throw error;
   }
 };
+
+// Import error handling middleware
+const {
+  globalErrorHandler,
+  notFoundHandler,
+  setupGracefulShutdown,
+  asyncHandler
+} = require('./middleware/errorHandler');
+
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: 'product-service'
+  });
+});
+
+// Apply error handling middleware after all routes
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
 
 // Start service with cleanup job
 const start = async () => {
@@ -467,13 +727,86 @@ const start = async () => {
     
     await sequelize.sync({ alter: true });
     console.log('Database synced');
+    
+    // Add sample products if none exist
+    const productCount = await Product.count();
+    if (productCount === 0) {
+      console.log('Adding sample products...');
+      await Product.bulkCreate([
+        {
+          name: 'MacBook Pro 16"',
+          price: 2499.99,
+          stock: 15,
+          category: 'Electronics',
+          description: 'Apple MacBook Pro with M2 Max chip'
+        },
+        {
+          name: 'iPhone 15 Pro',
+          price: 999.99,
+          stock: 25,
+          category: 'Electronics',
+          description: 'Latest iPhone with titanium design'
+        },
+        {
+          name: 'AirPods Pro',
+          price: 249.99,
+          stock: 50,
+          category: 'Electronics',
+          description: 'Active noise cancellation wireless earbuds'
+        },
+        {
+          name: 'iPad Air',
+          price: 599.99,
+          stock: 30,
+          category: 'Electronics',
+          description: '10.9-inch iPad with M1 chip'
+        },
+        {
+          name: 'Apple Watch Series 9',
+          price: 399.99,
+          stock: 40,
+          category: 'Electronics',
+          description: 'Advanced health and fitness tracking'
+        },
+        {
+          name: 'Magic Keyboard',
+          price: 179.99,
+          stock: 20,
+          category: 'Accessories',
+          description: 'Wireless keyboard for Mac and iPad'
+        },
+        {
+          name: 'Studio Display',
+          price: 1599.99,
+          stock: 8,
+          category: 'Electronics',
+          description: '27-inch 5K Retina display'
+        },
+        {
+          name: 'Mac Mini',
+          price: 699.99,
+          stock: 12,
+          category: 'Electronics',
+          description: 'Compact desktop computer with M2 chip'
+        }
+      ]);
+      console.log('Sample products added successfully');
+    } else {
+      console.log(`Found ${productCount} existing products`);
+    }
 
     await startKafkaConsumer();
     
     // Start cleanup job for expired reservations (only in production)
     if (process.env.NODE_ENV !== 'test') {
       setInterval(cleanupExpiredReservations, 5 * 60 * 1000); // Every 5 minutes
-      app.listen(port, () => console.log(`Product Service running on port ${port}`));
+      
+      const server = app.listen(port, () => {
+        console.log(`Product Service running on port ${port}`);
+      });
+      
+      // Setup graceful shutdown
+      setupGracefulShutdown(server);
     }
   } catch (error) {
     console.error('Startup error:', error);
@@ -491,8 +824,4 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Export the app for testing
 module.exports = app;
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
 
