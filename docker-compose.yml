@@ -168,11 +168,60 @@ services:
     networks:
       - ordering-net
 
+  # Authentication Service
+  auth-service:
+    build: ./auth-service
+    depends_on:
+      - auth_db
+    ports:
+      - "3004:3004"
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      DB_HOST: auth_db
+      DB_NAME: auth_db
+      DB_USER: postgres
+      DB_PASSWORD: password
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-super-secret-access-key-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-super-secret-refresh-key-change-in-production}
+      JWT_ACCESS_EXPIRES_IN: "15m"
+      JWT_REFRESH_EXPIRES_IN: "7d"
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3003
+    networks:
+      - ordering-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3004/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Authentication Database
+  auth_db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    networks:
+      - ordering-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
 volumes:
   orders_data:
   products_data:
   prometheus_data:
   grafana_data:
+  auth_data:
 
 networks:
   ordering-net:

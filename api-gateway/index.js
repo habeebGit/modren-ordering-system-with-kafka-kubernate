@@ -7,6 +7,9 @@ const { body, param, validationResult } = require('express-validator');
 const sanitizeHtml = require('sanitize-html');
 const xss = require('xss');
 const winston = require('winston');
+const request = require('request');
+
+const AuthMiddleware = require('./middleware/auth');
 
 const app = express();
 const port = 3000;
@@ -145,6 +148,30 @@ app.use((req, res, next) => {
   req.startTime = Date.now();
   next();
 });
+
+// Add auth routes to proxy to auth service
+app.use('/api/auth/*', (req, res) => {
+  const url = `${AUTH_SERVICE_URL}${req.originalUrl}`;
+  req.pipe(request({
+    url: url,
+    method: req.method,
+    json: req.body,
+    headers: {
+      ...req.headers,
+      'host': undefined
+    }
+  })).pipe(res);
+});
+
+// Protect order routes
+app.use('/api/orders', AuthMiddleware.authenticate);
+app.use('/api/orders/:id', AuthMiddleware.authenticate);
+
+// Products can be viewed by everyone, but mutations need auth
+app.get('/api/products*', AuthMiddleware.optional); // Optional auth for GET
+app.post('/api/products*', AuthMiddleware.authenticate, AuthMiddleware.authorize('admin', 'manager'));
+app.put('/api/products*', AuthMiddleware.authenticate, AuthMiddleware.authorize('admin', 'manager'));
+app.delete('/api/products*', AuthMiddleware.authenticate, AuthMiddleware.authorize('admin'));
 
 // Proxy routes with validation
 app.use('/api/orders', 
