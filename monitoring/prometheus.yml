@@ -1,0 +1,56 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'order-service'
+    static_configs:
+      - targets: ['order-service:3001']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'product-service'
+    static_configs:
+      - targets: ['product-service:3002']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['auth-service:3004']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  - job_name: 'postgres-orders'
+    static_configs:
+      - targets: ['orders_db:5432']
+
+  - job_name: 'postgres-products'
+    static_configs:
+      - targets: ['products_db:5432']
+
+  - job_name: 'postgres-auth'
+    static_configs:
+      - targets: ['auth_db:5432']

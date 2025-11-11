@@ -25,21 +25,23 @@ services:
     networks:
       - ordering-net
 
-  # PostgreSQL databases for each microservice
+  # Secure PostgreSQL databases with secrets
   orders_db:
     image: postgres:14
     environment:
       POSTGRES_DB: orders_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
     ports:
-      - "5433:5432"  # Changed port to avoid conflicts
+      - "5433:5432"
     volumes:
       - orders_data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - ordering-net
+    secrets:
+      - db_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d orders_db"]
       interval: 30s
@@ -51,122 +53,107 @@ services:
     environment:
       POSTGRES_DB: products_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
     ports:
-      - "5434:5432"  # Different port for products DB
+      - "5434:5432"
     volumes:
       - products_data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - ordering-net
+    secrets:
+      - db_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d products_db"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 30s
-  # Node.js Order Service container
+  auth_db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    ports:
+      - "5435:5432"
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    networks:
+      - ordering-net
+    secrets:
+      - db_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Enhanced Order Service with Authentication
   order-service:
     build: ./order-service
     depends_on:
-      orders_db:
-        condition: service_healthy
-      kafka:
-        condition: service_started
+      - orders_db
+      - kafka
+      - auth-service
     ports:
       - "3001:3001"
     environment:
       NODE_ENV: production
-      PORT: 3001
       DB_HOST: orders_db
-      DB_PORT: 5432
       DB_NAME: orders_db
       DB_USER: postgres
-      DB_PASSWORD: password
-      KAFKA_BROKERS: kafka:9092
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      KAFKA_BROKER: kafka:9092
+      AUTH_SERVICE_URL: http://auth-service:3004
       PRODUCT_SERVICE_URL: http://product-service:3002
       CORS_ORIGINS: http://localhost:3000,http://localhost:3003
+      LOG_LEVEL: info
     networks:
       - ordering-net
+    secrets:
+      - db_password
     restart: unless-stopped
-  # Node.js Product Service container
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Enhanced Product Service with Authentication
   product-service:
     build: ./product-service
     depends_on:
-      products_db:
-        condition: service_healthy
-      kafka:
-        condition: service_started
+      - products_db
+      - kafka
+      - auth-service
     ports:
       - "3002:3002"
     environment:
       NODE_ENV: production
-      PORT: 3002
       DB_HOST: products_db
-      DB_PORT: 5432
       DB_NAME: products_db
       DB_USER: postgres
-      DB_PASSWORD: password
-      KAFKA_BROKERS: kafka:9092
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      KAFKA_BROKER: kafka:9092
+      AUTH_SERVICE_URL: http://auth-service:3004
       CORS_ORIGINS: http://localhost:3000,http://localhost:3003
+      LOG_LEVEL: info
     networks:
       - ordering-net
+    secrets:
+      - db_password
     restart: unless-stopped
-    
-  # API Gateway container
-  api-gateway:
-    build: ./api-gateway
-    depends_on:
-      - order-service
-      - product-service
-    ports:
-      - "3003:3000"
-    environment:
-      NODE_ENV: production
-      PORT: 3000
-      ORDER_SERVICE_URL: http://order-service:3001
-      PRODUCT_SERVICE_URL: http://product-service:3002
-      CORS_ORIGINS: http://localhost:3000
-      RATE_LIMIT_MAX: 100
-      RATE_LIMIT_WINDOW_MS: 900000
-    networks:
-      - ordering-net
-    restart: unless-stopped
-  # React Frontend container
-  my-orderings-app:
-    build: ./my-orderings-app
-    depends_on:
-      - api-gateway
-    ports:
-      - "3000:3000"
-    environment:
-      REACT_APP_API_URL: http://localhost:3003
-      REACT_APP_ORDER_SERVICE_URL: http://localhost:3001
-      REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
-      CHOKIDAR_USEPOLLING: "true"
-    volumes:
-      - ./my-orderings-app/src:/app/src
-      - ./my-orderings-app/public:/app/public
-    networks:
-      - ordering-net
-    stdin_open: true
-    tty: true
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - ordering-net
-
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "3005:3000"
-    networks:
-      - ordering-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3002/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Authentication Service
   auth-service:
@@ -181,14 +168,20 @@ services:
       DB_HOST: auth_db
       DB_NAME: auth_db
       DB_USER: postgres
-      DB_PASSWORD: password
-      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-super-secret-access-key-change-in-production}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-super-secret-refresh-key-change-in-production}
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      JWT_ACCESS_SECRET_FILE: /run/secrets/jwt_access_secret
+      JWT_REFRESH_SECRET_FILE: /run/secrets/jwt_refresh_secret
       JWT_ACCESS_EXPIRES_IN: "15m"
       JWT_REFRESH_EXPIRES_IN: "7d"
       CORS_ORIGINS: http://localhost:3000,http://localhost:3003
+      LOG_LEVEL: info
+      BCRYPT_ROUNDS: 12
     networks:
       - ordering-net
+    secrets:
+      - db_password
+      - jwt_access_secret
+      - jwt_refresh_secret
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3004/health || exit 1"]
@@ -197,34 +190,169 @@ services:
       retries: 3
       start_period: 40s
 
-  # Authentication Database
-  auth_db:
-    image: postgres:14
+  # Enhanced API Gateway with Full Authentication
+  api-gateway:
+    build: ./api-gateway
+    depends_on:
+      - order-service
+      - product-service
+      - auth-service
+    ports:
+      - "3003:3000"
     environment:
-      POSTGRES_DB: auth_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
-    volumes:
-      - auth_data:/var/lib/postgresql/data
+      NODE_ENV: production
+      ORDER_SERVICE_URL: http://order-service:3001
+      PRODUCT_SERVICE_URL: http://product-service:3002
+      AUTH_SERVICE_URL: http://auth-service:3004
+      CORS_ORIGINS: http://localhost:3000
+      RATE_LIMIT_MAX: 100
+      RATE_LIMIT_WINDOW_MS: 900000
+      LOG_LEVEL: info
     networks:
       - ordering-net
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 30s
+      retries: 3
+      start_period: 40s
 
-volumes:
-  orders_data:
-  products_data:
-  prometheus_data:
-  grafana_data:
-  auth_data:
+  # Redis for Caching and Session Management
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis-secure-password}
+    volumes:
+      - redis_data:/data
+    networks:
+      - ordering-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # React Frontend with Authentication
+  my-orderings-app:
+    build: ./my-orderings-app
+    depends_on:
+      - api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:3003
+      REACT_APP_ORDER_SERVICE_URL: http://localhost:3001
+      REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
+      REACT_APP_AUTH_SERVICE_URL: http://localhost:3004
+      CHOKIDAR_USEPOLLING: "true"
+      NODE_ENV: production
+    volumes:
+      - ./my-orderings-app/src:/app/src
+      - ./my-orderings-app/public:/app/public
+    networks:
+      - ordering-net
+    stdin_open: true
+    tty: true
+
+  # Prometheus for Metrics Collection
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/rules.yml:/etc/prometheus/rules.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    networks:
+      - ordering-net
+    restart: unless-stopped
+
+  # Grafana for Visualization
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3005:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - ordering-net
+    restart: unless-stopped
+
+  # ELK Stack for Logging
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - ordering-net
+    restart: unless-stopped
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.5.0
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./monitoring/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./monitoring/logstash/config:/usr/share/logstash/config
+    networks:
+      - ordering-net
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.5.0
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    networks:
+      - ordering-net
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
 
 networks:
   ordering-net:
     driver: bridge
+
+volumes:
+  orders_data:
+  products_data:
+  auth_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  elasticsearch_data:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  jwt_access_secret:
+    file: ./secrets/jwt_access_secret.txt
+  jwt_refresh_secret:
+    file: ./secrets/jwt_refresh_secret.txt
 
 

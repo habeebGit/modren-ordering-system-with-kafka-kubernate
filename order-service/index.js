@@ -2,565 +2,458 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { Sequelize, DataTypes } = require('sequelize');
-const { Kafka } = require('kafkajs');
-const axios = require('axios');
+const { Sequelize, DataTypes, Op } = require('sequelize');
 const winston = require('winston');
-const morgan = require('morgan');
-const client = require('prom-client');
 
-// Import validation middleware
-const {
-  sanitizeInput,
-  validateSchema,
-  validationRules,
-  handleValidationErrors,
-  securityMiddleware,
-  schemas
-} = require('./middleware/validation');
+// Import metrics
+const { register, metricsMiddleware, updateBusinessMetric } = require('../shared/monitoring/metrics');
+
+// Import validation and middleware
+const { validationResult, body, param, query } = require('express-validator');
+const validationRules = require('./middleware/validation');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-const port = 3001;
+const PORT = process.env.PORT || 3001;
 
-// Security middleware
-app.use(helmet());
-app.use(securityMiddleware);
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: {
-    success: false,
-    message: 'Too many requests from this IP, please try again later'
-  }
-});
-app.use(limiter);
-
-// CORS configuration
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['http://localhost:3000'] // Add your production domains
-    : true,
-  credentials: true
-}));
-
-// Body parsing with size limits
-app.use(express.json({ 
-  limit: '10mb',
-  verify: (req, res, buf) => {
-    try {
-      JSON.parse(buf);
-    } catch (e) {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid JSON payload'
-      });
-      throw new Error('Invalid JSON');
-    }
-  }
-}));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Input sanitization middleware (apply to all routes)
-app.use(sanitizeInput);
-
-// Winston logger setup
+// Enhanced logging configuration
 const logger = winston.createLogger({
-  level: 'info',
+  level: process.env.LOG_LEVEL || 'info',
   format: winston.format.combine(
     winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
     winston.format.json()
   ),
+  defaultMeta: { service: 'order-service' },
   transports: [
-    new winston.transports.Console()
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.Console({
+      format: winston.format.simple()
+    })
   ]
 });
 
-// Morgan HTTP request logging, integrated with Winston
-app.use(morgan('combined', {
-  stream: {
-    write: (message) => logger.info(message.trim())
-  }
-}));
-
-// Database connection
+// Database configuration with connection pooling
 const sequelize = new Sequelize(
-    process.env.DB_NAME,
-    process.env.DB_USER,
-    process.env.DB_PASSWORD,
-    {
-        host: process.env.DB_HOST,
-        dialect: 'postgres'
+  process.env.DB_NAME || 'orders_db',
+  process.env.DB_USER || 'postgres',
+  process.env.DB_PASSWORD || 'password',
+  {
+    host: process.env.DB_HOST || 'orders_db',
+    dialect: 'postgres',
+    logging: (msg) => logger.debug(msg),
+    pool: {
+      max: 20,
+      min: 5,
+      acquire: 30000,
+      idle: 10000
     }
+  }
 );
 
-// Order Model
+// Enhanced Order Model with optimistic locking
 const Order = sequelize.define('Order', {
-    userId: { type: DataTypes.INTEGER, allowNull: false },
-    status: { type: DataTypes.STRING, defaultValue: 'Pending' }
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+      isUUID: 4
+    }
+  },
+  items: {
+    type: DataTypes.JSONB,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+      isValidItems(value) {
+        if (!Array.isArray(value) || value.length === 0) {
+          throw new Error('Items must be a non-empty array');
+        }
+        value.forEach(item => {
+          if (!item.productId || !item.quantity || !item.price) {
+            throw new Error('Each item must have productId, quantity, and price');
+          }
+        });
+      }
+    },
+  totalAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    validate: {
+      min: 0
+    }
+  },
+  status: {
+    type: DataTypes.ENUM('pending', 'confirmed', 'shipped', 'delivered', 'cancelled'),
+    defaultValue: 'pending'
+  },
+  shippingAddress: {
+    type: DataTypes.JSONB,
+    allowNull: false
+  },
+  version: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1
+  }
+}, {
+  tableName: 'orders',
+  timestamps: true,
+  indexes: [
+    {
+      fields: ['userId']
+    },
+    {
+      fields: ['status']
+    },
+    {
+      fields: ['createdAt']
+    }
+  ]
 });
 
-// Order Item Model
-const OrderItem = sequelize.define('OrderItem', {
-    productId: { type: DataTypes.INTEGER, allowNull: false },
-    quantity: { type: DataTypes.INTEGER, allowNull: false }
-});
-Order.hasMany(OrderItem, { as: 'items' });
-OrderItem.belongsTo(Order);
+// Security middleware
+app.use(helmet({
+  crossOriginEmbedderPolicy: false
+}));
 
-// Processed Event Model for idempotency
-const ProcessedEvent = sequelize.define('ProcessedEvent', {
-    id: { type: DataTypes.STRING, primaryKey: true },
-    eventType: { type: DataTypes.STRING, allowNull: false },
-    processedAt: { type: DataTypes.DATE, allowNull: false }
-});
+app.use(cors({
+  origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:3003'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
-// Kafka setup
-const kafka = new Kafka({ brokers: ['kafka:9092'] });
-const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'order-service-group' });
-
-// Create a Registry to register the metrics
-const register = new client.Registry();
-client.collectDefaultMetrics({ register });
-
-// Example custom metric
-const httpRequestCounter = new client.Counter({
-  name: 'http_requests_total',
-  help: 'Total number of HTTP requests',
-});
-register.registerMetric(httpRequestCounter);
-
-// Increment counter on each request
-app.use((req, res, next) => {
-  httpRequestCounter.inc();
-  next();
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { success: false, message: 'Too many requests' }
 });
 
-// Order creation endpoint with proper validation and transaction handling
-app.post('/orders', 
-  validationRules.createOrder,
-  handleValidationErrors,
-  validateSchema(schemas.createOrder),
-  async (req, res) => {
-    const { userId, items } = req.body;
+app.use(limiter);
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Add metrics middleware
+app.use(metricsMiddleware);
+
+// Authentication middleware (validates with auth service)
+const authMiddleware = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      updateBusinessMetric('authenticationAttempts', 'inc', { result: 'failed', type: 'missing_token' });
+      return res.status(401).json({
+        success: false,
+        message: 'Access token required'
+      });
+    }
+
+    const token = authHeader.substring(7);
     
-    const transaction = await sequelize.transaction();
-    try {
-        // Step 1: Create order in PENDING status first
-        const order = await Order.create({ 
-            userId, 
-            status: 'PENDING' 
-        }, { transaction });
+    // Validate with auth service
+    const axios = require('axios');
+    const response = await axios.post(`${process.env.AUTH_SERVICE_URL}/api/auth/validate`, {
+      token
+    }, { timeout: 5000 });
 
-        // Step 2: Create order items
-        const orderItems = await Promise.all(
-            items.map(item => 
-                OrderItem.create({ 
-                    OrderId: order.id, 
-                    productId: item.productId,
-                    quantity: item.quantity 
-                }, { transaction })
-            )
-        );
-
-        // Step 3: Send reservation request to product service (not immediate decrement)
-        const reservationRes = await axios.post(
-            process.env.PRODUCT_SERVICE_URL + '/reserve-stock',
-            { 
-                orderId: order.id,
-                items: items.map(item => ({
-                    productId: item.productId,
-                    quantity: item.quantity
-                }))
-            }
-        );
-
-        if (!reservationRes.data.success) {
-            throw new Error(reservationRes.data.message || "Stock reservation failed");
-        }
-
-        // Step 4: Update order status to CONFIRMED
-        await order.update({ status: 'CONFIRMED' }, { transaction });
-
-        // Step 5: Commit transaction
-        await transaction.commit();
-
-        logger.info('Order created successfully', { 
-            orderId: order.id, 
-            userId, 
-            items: items.length 
-        });
-
-        // Step 6: Send order created event (async, after transaction commit)
-        setImmediate(async () => {
-            await sendOrderEventWithRetry({ 
-                orderId: order.id, 
-                userId, 
-                items,
-                eventType: 'ORDER_CREATED',
-                timestamp: new Date().toISOString()
-            });
-        });
-
-        // Return order with items
-        const completeOrder = await Order.findByPk(order.id, {
-            include: [{ model: OrderItem, as: 'items' }]
-        });
-
-        res.status(201).json(completeOrder);
-    } catch (error) {
-        // Rollback transaction on any error
-        await transaction.rollback();
-        
-        logger.error('Order creation error', { 
-            error: error.message, 
-            stack: error.stack,
-            userId,
-            items 
-        });
-        
-        res.status(400).json({ 
-            message: error.message,
-            code: 'ORDER_CREATION_FAILED'
-        });
+    if (response.data.success) {
+      req.user = response.data.data.user;
+      updateBusinessMetric('authenticationAttempts', 'inc', { result: 'success', type: 'token_validation' });
+      next();
+    } else {
+      updateBusinessMetric('authenticationAttempts', 'inc', { result: 'failed', type: 'invalid_token' });
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token'
+      });
     }
-});
+  } catch (error) {
+    logger.error('Authentication error:', error);
+    updateBusinessMetric('authenticationAttempts', 'inc', { result: 'error', type: 'service_error' });
+    return res.status(500).json({
+      success: false,
+      message: 'Authentication failed'
+    });
+  }
+};
 
-// Get all orders endpoint with pagination and filtering
-app.get('/orders', 
-  validationRules.getOrders,
-  handleValidationErrors,
-  validateSchema(schemas.pagination, 'query'),
-  async (req, res) => {
-    try {
-        const { page, limit, sortBy, sortOrder } = req.query;
-        const offset = (page - 1) * limit;
-        
-        const orders = await Order.findAndCountAll({
-            include: [{ model: OrderItem, as: 'items' }],
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-            order: [[sortBy, sortOrder]]
-        });
-        
-        res.json({
-            success: true,
-            data: {
-                orders: orders.rows,
-                pagination: {
-                    currentPage: page,
-                    totalPages: Math.ceil(orders.count / limit),
-                    totalItems: orders.count,
-                    itemsPerPage: limit
-                }
-            }
-        });
-    } catch (error) {
-        logger.error('Fetch orders error:', error);
-        res.status(500).json({ 
-            success: false,
-            message: 'Failed to fetch orders',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-});
-
-// Get order by ID endpoint
-app.get('/orders/:id', 
-  validationRules.getOrderById,
-  handleValidationErrors,
-  validateSchema(schemas.orderId, 'params'),
-  async (req, res) => {
-    try {
-        const { id } = req.params;
-        const order = await Order.findByPk(id, {
-            include: [{ model: OrderItem, as: 'items' }]
-        });
-        
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
-        }
-        
-        res.json({
-            success: true,
-            data: order
-        });
-    } catch (error) {
-        logger.error('Fetch order by ID error:', error);
-        res.status(500).json({ 
-            success: false,
-            message: 'Failed to fetch order',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-});
-
-// Update order status endpoint
-app.put('/orders/:id/status', 
-  validationRules.updateOrderStatus,
-  handleValidationErrors,
-  validateSchema(schemas.updateOrderStatus),
-  async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { status } = req.body;
-        
-        const order = await Order.findByPk(id);
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
-        }
-        
-        await order.update({ status });
-        
-        // Send order status updated event
-        setImmediate(async () => {
-            await sendOrderEventWithRetry({
-                orderId: order.id,
-                eventType: 'ORDER_STATUS_UPDATED',
-                status: status,
-                previousStatus: order.status
-            });
-        });
-        
-        res.json({
-            success: true,
-            data: order,
-            message: `Order status updated to ${status}`
-        });
-    } catch (error) {
-        logger.error('Update order status error:', error);
-        res.status(500).json({ 
-            success: false,
-            message: 'Failed to update order status',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-});
-
-// Health check endpoint
-app.get('/', (req, res) => {
-  res.send('Order Service is running');
+// Health check with detailed status
+app.get('/health', async (req, res) => {
+  try {
+    // Check database connection
+    await sequelize.authenticate();
+    
+    // Update database connections metric
+    updateBusinessMetric('databaseConnections', 'set', { database: 'orders' }, sequelize.connectionManager.pool.size);
+    
+    res.json({
+      success: true,
+      message: 'Order service is healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: 'connected',
+      version: '1.0.0'
+    });
+  } catch (error) {
+    logger.error('Health check failed:', error);
+    res.status(503).json({
+      success: false,
+      message: 'Service unhealthy',
+      error: error.message
+    });
+  }
 });
 
 // Metrics endpoint
 app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', register.contentType);
-  res.end(await register.metrics());
+  try {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  } catch (error) {
+    res.status(500).end();
+  }
 });
 
-// Kafka event sending with retry logic and proper message ID
-async function sendOrderEventWithRetry(event, retries = 3) {
-    const messageId = `${event.eventType}-${event.orderId}-${Date.now()}`;
-    let attempt = 0;
-    
-    while (attempt < retries) {
-        try {
-            await producer.connect();
-            await producer.send({
-                topic: 'order-events',
-                messages: [{ 
-                    key: event.orderId.toString(),
-                    value: JSON.stringify({ 
-                        messageId,
-                        eventType: event.eventType,
-                        event,
-                        timestamp: new Date().toISOString()
-                    }) 
-                }]
-            });
-            await producer.disconnect();
-            logger.info('Event sent successfully', { messageId, eventType: event.eventType });
-            return;
-        } catch (err) {
-            attempt++;
-            logger.warn(`Event send attempt ${attempt} failed`, { messageId, error: err.message });
-            if (attempt === retries) {
-                logger.error('Kafka event failed after retries, saving to dead-letter', { 
-                    messageId, 
-                    event, 
-                    error: err.message 
-                });
-                // Save to dead-letter table for manual processing
-                await saveToDeadLetter(messageId, event, err.message);
-            }
-        }
-    }
-}
-
-// Handle stock reservation failure
-async function handleStockReservationFailure(orderId) {
-    const transaction = await sequelize.transaction();
+// Create order with comprehensive validation and monitoring
+app.post('/orders', 
+  authMiddleware,
+  validationRules.createOrder,
+  async (req, res) => {
     try {
-        const order = await Order.findByPk(orderId, { transaction });
-        if (order) {
-            await order.update({ status: 'CANCELLED' }, { transaction });
-            await transaction.commit();
-            logger.info('Order cancelled due to stock reservation failure', { orderId });
-        }
-    } catch (error) {
-        await transaction.rollback();
-        logger.error('Error cancelling order', { orderId, error: error.message });
-    }
-}
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array()
+        });
+      }
 
-// Save failed events to dead letter table
-async function saveToDeadLetter(messageId, event, errorMessage) {
+      const { items, shippingAddress } = req.body;
+      
+      // Calculate total amount
+      const totalAmount = items.reduce((sum, item) => {
+        return sum + (parseFloat(item.price) * parseInt(item.quantity));
+      }, 0);
+
+      // Create order with transaction
+      const result = await sequelize.transaction(async (t) => {
+        const order = await Order.create({
+          userId: req.user.id,
+          items,
+          totalAmount,
+          shippingAddress,
+          status: 'pending'
+        }, { transaction: t });
+
+        // Update business metrics
+        updateBusinessMetric('ordersCreated', 'inc', { 
+          status: 'pending', 
+          user_id: req.user.id 
+        });
+        updateBusinessMetric('revenue', 'inc', { currency: 'USD' }, totalAmount);
+
+        // Publish order created event to Kafka
+        await publishOrderEvent('order.created', {
+          orderId: order.id,
+          userId: order.userId,
+          items: order.items,
+          totalAmount: order.totalAmount,
+          timestamp: new Date().toISOString()
+        });
+
+        return order;
+      });
+
+      logger.info('Order created:', { orderId: result.id, userId: req.user.id });
+
+      res.status(201).json({
+        success: true,
+        message: 'Order created successfully',
+        data: { order: result }
+      });
+
+    } catch (error) {
+      logger.error('Create order error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to create order'
+      });
+    }
+  }
+);
+
+// Get orders with pagination and monitoring
+app.get('/orders',
+  authMiddleware,
+  [
+    query('page').optional().isInt({ min: 1 }),
+    query('limit').optional().isInt({ min: 1, max: 100 }),
+    query('status').optional().isIn(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'])
+  ],
+  async (req, res) => {
     try {
-        // You can create a DeadLetterEvent model for this
-        logger.error('Saving to dead letter queue', { messageId, event, errorMessage });
-        // TODO: Implement proper dead letter storage
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array()
+        });
+      }
+
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const status = req.query.status;
+      const offset = (page - 1) * limit;
+
+      const whereClause = { userId: req.user.id };
+      if (status) {
+        whereClause.status = status;
+      }
+
+      const { count, rows } = await Order.findAndCountAll({
+        where: whereClause,
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: ['version'] }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          orders: rows,
+          pagination: {
+            page,
+            limit,
+            total: count,
+            totalPages: Math.ceil(count / limit)
+          }
+        }
+      });
+
     } catch (error) {
-        logger.error('Failed to save to dead letter queue', { error: error.message });
+      logger.error('Get orders error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch orders'
+      });
     }
-}
+  }
+);
 
-// Kafka consumer for order events (removed stock logic - handled by product service)
-const consumeOrderEvents = async () => {
-    await consumer.connect();
-    await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
-    await consumer.run({
-        eachMessage: async ({ message }) => {
-            try {
-                const { eventType, event, messageId } = JSON.parse(message.value.toString());
-                
-                // Implement idempotency check
-                const processedEvent = await ProcessedEvent.findByPk(messageId);
-                if (processedEvent) {
-                    logger.info('Event already processed, skipping', { messageId, eventType });
-                    return;
-                }
+// Kafka producer for event publishing
+const kafka = require('kafkajs');
 
-                switch (eventType) {
-                    case 'STOCK_RESERVED':
-                        logger.info('Stock reserved for order', { 
-                            orderId: event.orderId,
-                            items: event.items.length 
-                        });
-                        break;
-                    
-                    case 'STOCK_RESERVATION_FAILED':
-                        // Handle failed stock reservation - cancel the order
-                        await handleStockReservationFailure(event.orderId);
-                        break;
-                    
-                    case 'ORDER_CANCELLED':
-                        logger.info('Order cancelled event received', { orderId: event.orderId });
-                        break;
-                        
-                    default:
-                        logger.warn('Unknown event type received', { eventType, event });
-                }
+const kafkaClient = kafka({
+  clientId: 'order-service',
+  brokers: [process.env.KAFKA_BROKER || 'kafka:9092'],
+  logLevel: kafka.logLevel.INFO
+});
 
-                // Mark event as processed
-                await ProcessedEvent.create({ 
-                    id: messageId, 
-                    eventType, 
-                    processedAt: new Date() 
-                });
+const producer = kafkaClient.producer({
+  maxInFlightRequests: 1,
+  idempotent: true,
+  transactionTimeout: 30000
+});
 
-            } catch (error) {
-                logger.error('Error processing order event', { 
-                    error: error.message, 
-                    stack: error.stack 
-                });
-            }
-        },
+async function publishOrderEvent(eventType, data) {
+  try {
+    await producer.send({
+      topic: 'order-events',
+      messages: [
+        {
+          key: data.orderId.toString(),
+          value: JSON.stringify({
+            eventType,
+            data,
+            timestamp: new Date().toISOString()
+          }),
+          headers: {
+            'event-type': eventType,
+            'service': 'order-service'
+          }
+        }
+      ]
     });
-};
 
-// Example usage in routes and error handling
-app.get('/health', (req, res) => {
-  logger.info('Health check requested');
-  res.json({ status: 'ok' });
+    updateBusinessMetric('kafkaMessages', 'inc', { 
+      topic: 'order-events', 
+      status: 'sent',
+      consumer_group: 'order-service'
+    });
+
+    logger.info('Order event published:', { eventType, orderId: data.orderId });
+  } catch (error) {
+    logger.error('Failed to publish order event:', error);
+    updateBusinessMetric('kafkaMessages', 'inc', { 
+      topic: 'order-events', 
+      status: 'failed',
+      consumer_group: 'order-service'
+    });
+  }
+}
+
+// Error handling middleware
+app.use(errorHandler);
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Endpoint not found'
+  });
 });
 
-app.use((err, req, res, next) => {
-  logger.error(`Error: ${err.message}`, { stack: err.stack });
-  res.status(500).json({ message: 'Internal Server Error' });
-});
+// Graceful shutdown
+async function gracefulShutdown() {
+  try {
+    logger.info('Shutting down gracefully...');
+    await producer.disconnect();
+    await sequelize.close();
+    process.exit(0);
+  } catch (error) {
+    logger.error('Error during shutdown:', error);
+    process.exit(1);
+  }
+}
 
-// Order cancellation endpoint
-app.post('/orders/:orderId/cancel', async (req, res) => {
-    const { orderId } = req.params;
-    const transaction = await sequelize.transaction();
-    
-    try {
-        const order = await Order.findByPk(orderId, {
-            include: [{ model: OrderItem, as: 'items' }],
-            transaction
-        });
-        
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
-        }
-        
-        if (order.status === 'CANCELLED') {
-            return res.status(400).json({ message: 'Order already cancelled' });
-        }
-        
-        // Update order status
-        await order.update({ status: 'CANCELLED' }, { transaction });
-        await transaction.commit();
-        
-        // Send cancellation event to release stock
-        await sendOrderEventWithRetry({
-            eventType: 'ORDER_CANCELLED',
-            orderId: order.id,
-            items: order.items.map(item => ({
-                productId: item.productId,
-                quantity: item.quantity
-            }))
-        });
-        
-        logger.info('Order cancelled successfully', { orderId });
-        res.json({ success: true, message: 'Order cancelled successfully' });
-        
-    } catch (error) {
-        await transaction.rollback();
-        logger.error('Error cancelling order', { orderId, error: error.message });
-        res.status(500).json({ message: error.message });
-    }
-});
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
 
-// Import error handling middleware
-const {
-  globalErrorHandler,
-  notFoundHandler,
-  setupGracefulShutdown,
-  asyncHandler
-} = require('./middleware/errorHandler');
+// Start server
+async function startServer() {
+  try {
+    // Connect to database
+    await sequelize.authenticate();
+    logger.info('Database connection established');
 
-// Apply error handling middleware after all routes
-app.use(notFoundHandler);
-app.use(globalErrorHandler);
+    // Sync database
+    await sequelize.sync({ alter: true });
+    logger.info('Database synchronized');
 
-// Start service
-const start = async () => {
-    try {
-        await sequelize.sync({ alter: true }); // This will add missing columns
-        consumeOrderEvents(); // Start the Kafka consumer
-        
-        const server = app.listen(port, () => {
-            logger.info(`Order Service is running on port ${port}`);
-        });
-        
-        // Setup graceful shutdown
-        setupGracefulShutdown(server);
-        
-    } catch (error) {
-        logger.error('Failed to start order service', { error: error.message });
-        process.exit(1);
-    }
-};
-start();
+    // Connect Kafka producer
+    await producer.connect();
+    logger.info('Kafka producer connected');
 
-module.exports = app;
+    // Start server
+    app.listen(PORT, () => {
+      logger.info(`Order service running on port ${PORT}`);
+    });
+
+  } catch (error) {
+    logger.error('Failed to start order service:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
 
