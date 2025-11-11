@@ -65,6 +65,12 @@ function App() {
   };
 
   const addToCart = (product) => {
+    // Ensure price is a number
+    const productWithNumericPrice = {
+      ...product,
+      price: typeof product.price === 'string' ? parseFloat(product.price) : product.price
+    };
+    
     const existingItem = cart.find(item => item.id === product.id);
     if (existingItem) {
       setCart(cart.map(item =>
@@ -73,7 +79,7 @@ function App() {
           : item
       ));
     } else {
-      setCart([...cart, { ...product, quantity: 1 }]);
+      setCart([...cart, { ...productWithNumericPrice, quantity: 1 }]);
     }
   };
 
