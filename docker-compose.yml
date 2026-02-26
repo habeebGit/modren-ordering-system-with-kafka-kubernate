@@ -3,6 +3,7 @@ services:
   # Kafka setup (zookeeper is a dependency)
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
+    platform: linux/amd64
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -11,7 +12,10 @@ services:
     networks:
       - ordering-net
   kafka:
-    image: confluentinc/cp-kafka:7.0.1
+    build:
+      context: .
+      dockerfile: kafka/Dockerfile
+    platform: linux/amd64
     depends_on:
       - zookeeper
     ports:
@@ -19,11 +23,26 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # Ensure Kafka listens on all interfaces and advertise the container DNS address
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      # Use host.docker.internal for host-level access on macOS; fallback to localhost if not available
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # Limit JVM heap for Kafka to avoid container OOM on low-memory hosts (adjust as needed)
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     networks:
       - ordering-net
+    restart: unless-stopped
+    # baked-in readiness script (copied into image at build time)
+    healthcheck:
+      test: ["CMD-SHELL", "/usr/local/bin/kafka-ready.sh || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 8
+      start_period: 20s
 
   # PostgreSQL databases for each microservice
   orders_db:
@@ -73,7 +92,7 @@ services:
       orders_db:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3001:3001"
     environment:
@@ -88,6 +107,12 @@ services:
     networks:
       - ordering-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "const http=require('http');const options={host:'localhost',port:3001,path:'/health',method:'GET',timeout:2000};const req=http.request(options,res=>{if(res.statusCode>=200&&res.statusCode<300)process.exit(0);else process.exit(1)});req.on('error',()=>process.exit(1));req.on('timeout',()=>process.exit(1));req.end();"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
   # Node.js Product Service container
   product-service:
     build: ./product-service
@@ -95,7 +120,7 @@ services:
       products_db:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3002:3002"
     environment:
@@ -110,6 +135,12 @@ services:
     networks:
       - ordering-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "const http=require('http');const options={host:'localhost',port:3002,path:'/health',method:'GET',timeout:2000};const req=http.request(options,res=>{if(res.statusCode>=200&&res.statusCode<300)process.exit(0);else process.exit(1)});req.on('error',()=>process.exit(1));req.on('timeout',()=>process.exit(1));req.end();"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
   # React Frontend container
   my-ordering-app:
     build: ./my-ordering-app
@@ -119,8 +150,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_ORDER_SERVICE_URL: http://localhost:3001
-      REACT_APP_PRODUCT_SERVICE_URL: http://localhost:3002
+      REACT_APP_ORDER_SERVICE_URL: http://order-service:3001
+      REACT_APP_PRODUCT_SERVICE_URL: http://product-service:3002
       CHOKIDAR_USEPOLLING: "true"
     volumes:
       - ./my-ordering-app/src:/app/src

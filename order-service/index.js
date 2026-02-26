@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
@@ -6,6 +7,8 @@ const axios = require('axios');
 const winston = require('winston');
 const morgan = require('morgan');
 const client = require('prom-client');
+const message = require('./lib/message');
+const dns = require('dns').promises;
 
 const app = express();
 const port = 3001;
@@ -64,8 +67,18 @@ const ProcessedEvent = sequelize.define('ProcessedEvent', {
     processedAt: { type: DataTypes.DATE, allowNull: false }
 });
 
+// Dead Letter Event Model to persist failed events
+const DeadLetterEvent = sequelize.define('DeadLetterEvent', {
+    id: { type: DataTypes.STRING, primaryKey: true },
+    eventType: { type: DataTypes.STRING },
+    payload: { type: DataTypes.JSON },
+    errorMessage: { type: DataTypes.TEXT },
+    createdAt: { type: DataTypes.DATE, defaultValue: Sequelize.NOW }
+});
+
 // Kafka setup
-const kafka = new Kafka({ brokers: ['kafka:9092'] });
+const kafkaBrokers = (process.env.KAFKA_BROKERS || 'kafka:9092').split(',');
+const kafka = new Kafka({ brokers: kafkaBrokers });
 const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: 'order-service-group' });
 
@@ -199,38 +212,42 @@ app.get('/metrics', async (req, res) => {
 
 // Kafka event sending with retry logic and proper message ID
 async function sendOrderEventWithRetry(event, retries = 3) {
-    const messageId = `${event.eventType}-${event.orderId}-${Date.now()}`;
     let attempt = 0;
-    
+
     while (attempt < retries) {
         try {
-            await producer.connect();
+            // Producer is long-lived and connected at startup
             await producer.send({
                 topic: 'order-events',
-                messages: [{ 
-                    key: event.orderId.toString(),
-                    value: JSON.stringify({ 
-                        messageId,
-                        eventType: event.eventType,
-                        event,
-                        timestamp: new Date().toISOString()
-                    }) 
+                messages: [{
+                    key: event.orderId ? event.orderId.toString() : undefined,
+                    value: message.stringifyEnvelope(event.eventType, event)
                 }]
             });
-            await producer.disconnect();
-            logger.info('Event sent successfully', { messageId, eventType: event.eventType });
+
+            logger.info('Event sent successfully', { eventType: event.eventType });
             return;
         } catch (err) {
             attempt++;
-            logger.warn(`Event send attempt ${attempt} failed`, { messageId, error: err.message });
+            logger.warn(`Event send attempt ${attempt} failed`, { error: err.message });
+
             if (attempt === retries) {
-                logger.error('Kafka event failed after retries, saving to dead-letter', { 
-                    messageId, 
-                    event, 
-                    error: err.message 
+                const envelope = message.createEnvelope(event.eventType, event);
+                logger.error('Kafka event failed after retries, saving to dead-letter', {
+                    messageId: envelope.messageId,
+                    event,
+                    error: err.message
                 });
                 // Save to dead-letter table for manual processing
-                await saveToDeadLetter(messageId, event, err.message);
+                try {
+                    await saveToDeadLetter(envelope.messageId, event, err.message);
+                } catch (dlErr) {
+                    logger.error('Failed to save to dead letter in sendOrderEventWithRetry', { dlError: dlErr.message });
+                }
+            } else {
+                // Exponential backoff with jitter
+                const backoffMs = Math.min(2000, Math.pow(2, attempt) * 100) + Math.floor(Math.random() * 100);
+                await new Promise(resolve => setTimeout(resolve, backoffMs));
             }
         }
     }
@@ -255,9 +272,15 @@ async function handleStockReservationFailure(orderId) {
 // Save failed events to dead letter table
 async function saveToDeadLetter(messageId, event, errorMessage) {
     try {
-        // You can create a DeadLetterEvent model for this
-        logger.error('Saving to dead letter queue', { messageId, event, errorMessage });
-        // TODO: Implement proper dead letter storage
+        // Persist dead-letter entry for manual inspection / replay
+        await DeadLetterEvent.create({
+            id: messageId,
+            eventType: event && event.eventType ? event.eventType : (event && event.type ? event.type : 'UNKNOWN'),
+            payload: event,
+            errorMessage
+        });
+
+        logger.error('Saved event to dead letter table', { messageId, errorMessage });
     } catch (error) {
         logger.error('Failed to save to dead letter queue', { error: error.message });
     }
@@ -268,10 +291,15 @@ const consumeOrderEvents = async () => {
     await consumer.connect();
     await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
     await consumer.run({
-        eachMessage: async ({ message }) => {
+        eachMessage: async ({ message: kafkaMessage }) => {
             try {
-                const { eventType, event, messageId } = JSON.parse(message.value.toString());
-                
+                const envelope = message.parseEnvelope(kafkaMessage.value);
+                if (!envelope) {
+                    logger.warn('Received invalid message envelope');
+                    return;
+                }
+                const { messageId, eventType, payload } = envelope;
+
                 // Implement idempotency check
                 const processedEvent = await ProcessedEvent.findByPk(messageId);
                 if (processedEvent) {
@@ -282,22 +310,22 @@ const consumeOrderEvents = async () => {
                 switch (eventType) {
                     case 'STOCK_RESERVED':
                         logger.info('Stock reserved for order', { 
-                            orderId: event.orderId,
-                            items: event.items.length 
+                            orderId: payload.orderId,
+                            items: payload.items ? payload.items.length : 0
                         });
                         break;
                     
                     case 'STOCK_RESERVATION_FAILED':
                         // Handle failed stock reservation - cancel the order
-                        await handleStockReservationFailure(event.orderId);
+                        await handleStockReservationFailure(payload.orderId);
                         break;
                     
                     case 'ORDER_CANCELLED':
-                        logger.info('Order cancelled event received', { orderId: event.orderId });
+                        logger.info('Order cancelled event received', { orderId: payload.orderId });
                         break;
                         
                     default:
-                        logger.warn('Unknown event type received', { eventType, event });
+                        logger.warn('Unknown event type received', { eventType, payload });
                 }
 
                 // Mark event as processed
@@ -371,13 +399,113 @@ app.post('/orders/:orderId/cancel', async (req, res) => {
     }
 });
 
+// Wait for Kafka brokers DNS to be resolvable before attempting to connect
+async function waitForBrokers(brokers, timeoutMs = 120000) {
+  const hosts = brokers.map(b => b.split(':')[0]);
+  const start = Date.now();
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  while (Date.now() - start < timeoutMs) {
+    try {
+      for (const host of hosts) {
+        // Try to resolve the host via DNS
+        await dns.lookup(host);
+      }
+      return true;
+    } catch (err) {
+      logger.info('Waiting for Kafka broker DNS to resolve', { error: err.code || err.message });
+      await delay(2000);
+    }
+  }
+  throw new Error('Timed out waiting for Kafka brokers to be resolvable');
+}
+
 // Start service
 const start = async () => {
     await sequelize.sync({ alter: true }); // This will add missing columns
-    consumeOrderEvents(); // Start the Kafka consumer
-    app.listen(port, () => {
+
+    // Wait for Kafka brokers DNS to be resolvable before attempting to connect
+    try {
+        await waitForBrokers(kafkaBrokers, 120000);
+    } catch (err) {
+        logger.warn('Kafka brokers did not resolve in time, continuing startup and will retry connects', { error: err.message });
+    }
+
+    // Connect a single long-lived Kafka producer to be reused for all sends
+    try {
+        await producer.connect();
+        logger.info('Kafka producer connected');
+    } catch (err) {
+        logger.error('Failed to connect Kafka producer on startup', { error: err.message });
+        // Do not throw: allow retries when sending
+    }
+
+    // Start consumer with retry logic
+    (async function startConsumerWithRetry(retries = 10) {
+        let attempt = 0;
+        while (attempt < retries) {
+            try {
+                await consumeOrderEvents(); // this connects the consumer inside
+                logger.info('Kafka consumer started');
+                break;
+            } catch (err) {
+                attempt++;
+                logger.warn(`Consumer start attempt ${attempt} failed`, { error: err.message });
+                const backoff = Math.min(30000, 1000 * Math.pow(2, attempt));
+                await new Promise(r => setTimeout(r, backoff));
+            }
+        }
+        if (attempt === retries) {
+            logger.error('Failed to start Kafka consumer after retries');
+        }
+    })();
+
+    const server = app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
     });
+
+    // Graceful shutdown handlers
+    const gracefulShutdown = async () => {
+        logger.info('Shutting down gracefully...');
+        try {
+            if (server) {
+                server.close(() => logger.info('HTTP server closed'));
+            }
+
+            try {
+                if (producer) {
+                    await producer.disconnect();
+                    logger.info('Kafka producer disconnected');
+                }
+            } catch (pErr) {
+                logger.warn('Error disconnecting producer', { error: pErr.message });
+            }
+
+            try {
+                if (consumer) {
+                    await consumer.disconnect();
+                    logger.info('Kafka consumer disconnected');
+                }
+            } catch (cErr) {
+                logger.warn('Error disconnecting consumer', { error: cErr.message });
+            }
+
+            try {
+                await sequelize.close();
+                logger.info('Database connection closed');
+            } catch (dbErr) {
+                logger.warn('Error closing DB connection', { error: dbErr.message });
+            }
+
+            process.exit(0);
+        } catch (err) {
+            logger.error('Error during graceful shutdown', { error: err.message });
+            process.exit(1);
+        }
+    };
+
+    process.on('SIGINT', gracefulShutdown);
+    process.on('SIGTERM', gracefulShutdown);
 };
 start();
 

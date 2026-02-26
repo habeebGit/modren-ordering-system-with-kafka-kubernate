@@ -1,0 +1,104 @@
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/postgresql/data ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... Etc/UTC
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+
+Success. You can now start the database server using:
+
+    pg_ctl -D /var/lib/postgresql/data -l logfile start
+
+initdb: warning: enabling "trust" authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+waiting for server to start....2026-02-25 11:40:01.774 UTC [48] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-02-25 11:40:01.775 UTC [48] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-02-25 11:40:01.778 UTC [49] LOG:  database system was shut down at 2026-02-25 11:40:01 UTC
+2026-02-25 11:40:01.781 UTC [48] LOG:  database system is ready to accept connections
+ done
+server started
+CREATE DATABASE
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/00-init.sql
+CREATE EXTENSION
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/01-seed-products.sql
+CREATE TABLE
+INSERT 0 8
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/02-seed-orders.sql
+CREATE TABLE
+CREATE TABLE
+INSERT 0 3
+INSERT 0 6
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init-database.sql
+DO
+psql:/docker-entrypoint-initdb.d/init-database.sql:12: NOTICE:  Role setup done
+DO
+DO
+
+
+waiting for server to shut down....2026-02-25 11:40:02.102 UTC [48] LOG:  received fast shutdown request
+2026-02-25 11:40:02.103 UTC [48] LOG:  aborting any active transactions
+2026-02-25 11:40:02.104 UTC [48] LOG:  background worker "logical replication launcher" (PID 55) exited with exit code 1
+2026-02-25 11:40:02.104 UTC [50] LOG:  shutting down
+2026-02-25 11:40:02.120 UTC [48] LOG:  database system is shut down
+ done
+server stopped
+
+PostgreSQL init process complete; ready for start up.
+
+2026-02-25 11:40:02.224 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-02-25 11:40:02.224 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-02-25 11:40:02.224 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-02-25 11:40:02.226 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-02-25 11:40:02.229 UTC [71] LOG:  database system was shut down at 2026-02-25 11:40:02 UTC
+2026-02-25 11:40:02.231 UTC [1] LOG:  database system is ready to accept connections
+2026-02-25 11:58:10.326 UTC [460] ERROR:  column "reservedstock" of relation "products" does not exist at character 36
+2026-02-25 11:58:10.326 UTC [460] STATEMENT:  INSERT INTO Products (name, stock, reservedStock, version, createdAt, updatedAt) VALUES ('E2E Test Product', 10, 0, 1, now(), now());
+2026-02-25 11:59:13.517 UTC [488] ERROR:  column "reservedstock" of relation "products" does not exist at character 36
+2026-02-25 11:59:13.517 UTC [488] STATEMENT:  INSERT INTO products (name, stock, reservedstock, version, createdat, updatedat) VALUES ('E2E Test Product',10,0,1,now(),now());
+2026-02-25 12:02:31.769 UTC [568] ERROR:  syntax error at or near "Test" at character 103
+2026-02-25 12:02:31.769 UTC [568] STATEMENT:  INSERT INTO "Products" ("name","stock","reservedStock","version","createdAt","updatedAt") VALUES (E2E Test Product, 10, 0, 1, now(), now());
+2026-02-25 12:03:21.443 UTC [593] ERROR:  column "e2etestproduct" does not exist at character 99
+2026-02-25 12:03:21.443 UTC [593] STATEMENT:  INSERT INTO "Products" ("name","stock","reservedStock","version","createdAt","updatedAt") VALUES (E2ETestProduct, 10, 0, 1, now(), now());
+2026-02-25 12:03:51.990 UTC [609] ERROR:  column "e2etestproduct" does not exist at character 99
+2026-02-25 12:03:51.990 UTC [609] STATEMENT:  INSERT INTO "Products" ("name","stock","reservedStock","version","createdAt","updatedAt") VALUES (E2ETestProduct, 10, 0, 1, now(), now());
+2026-02-25 12:04:17.257 UTC [628] ERROR:  column "testproduct" does not exist at character 99
+2026-02-25 12:04:17.257 UTC [628] STATEMENT:  INSERT INTO "Products" ("name","stock","reservedStock","version","createdAt","updatedAt") VALUES (TestProduct, 10, 0, 1, now(), now());
+2026-02-25 12:04:36.780 UTC [636] ERROR:  column "TestProduct" does not exist at character 99
+2026-02-25 12:04:36.780 UTC [636] STATEMENT:  INSERT INTO "Products" ("name","stock","reservedStock","version","createdAt","updatedAt") VALUES ("TestProduct", 10, 0, 1, now(), now());
+2026-02-25 12:05:48.707 UTC [669] ERROR:  column "testproduct" does not exist at character 99
+2026-02-25 12:05:48.707 UTC [669] STATEMENT:  INSERT INTO "Products" ("name","stock","reservedStock","version","createdAt","updatedAt") VALUES (TestProduct, 10, 0, 1, now(), now());
+2026-02-25 12:07:09.717 UTC [698] ERROR:  column "testproduct" does not exist at character 99
+2026-02-25 12:07:09.717 UTC [698] STATEMENT:  INSERT INTO "Products" ("name","stock","reservedStock","version","createdAt","updatedAt") VALUES (TestProduct, 10, 0, 1, now(), now());
+2026-02-25 12:07:40.432 UTC [714] ERROR:  column "reservedstock" of relation "products" does not exist at character 34
+2026-02-25 12:07:40.432 UTC [714] STATEMENT:  INSERT INTO Products (name,stock,reservedStock,version,createdAt,updatedAt) VALUES ('TestProduct', 10, 0, 1, now(), now());
+2026-02-25 12:08:34.970 UTC [742] ERROR:  column "reservedstock" of relation "products" does not exist at character 34
+2026-02-25 12:08:34.970 UTC [742] STATEMENT:  INSERT INTO Products (name,stock,reservedStock,version,createdAt,updatedAt) VALUES ('TestProduct', 10, 0, 1, now(), now());
+2026-02-25 12:09:26.628 UTC [766] ERROR:  column "reservedstock" of relation "products" does not exist at character 34
+2026-02-25 12:09:26.628 UTC [766] STATEMENT:  INSERT INTO Products (name,stock,reservedStock,version,createdAt,updatedAt) VALUES ('TestProduct', 10, 0, 1, now(), now());
+2026-02-25 12:10:54.832 UTC [810] ERROR:  column "reservedstock" of relation "products" does not exist at character 34
+2026-02-25 12:10:54.832 UTC [810] STATEMENT:  INSERT INTO Products (name,stock,reservedStock,version,createdAt,updatedAt) VALUES ('TestProduct', 10, 0, 1, now(), now());
+2026-02-25 12:11:26.479 UTC [826] ERROR:  column "reservedstock" of relation "products" does not exist at character 34
+2026-02-25 12:11:26.479 UTC [826] STATEMENT:  INSERT INTO Products (name,stock,reservedstock,version,createdAt,updatedAt) VALUES ('TestProduct', 10, 0, 1, now(), now());

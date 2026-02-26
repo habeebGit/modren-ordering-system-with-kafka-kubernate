@@ -1,0 +1,81 @@
+time="2026-02-26T05:26:37-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+products_db-1  | The files belonging to this database system will be owned by user "postgres".
+products_db-1  | This user must also own the server process.
+products_db-1  | 
+products_db-1  | The database cluster will be initialized with locale "en_US.utf8".
+products_db-1  | The default database encoding has accordingly been set to "UTF8".
+products_db-1  | The default text search configuration will be set to "english".
+products_db-1  | 
+products_db-1  | Data page checksums are disabled.
+products_db-1  | 
+products_db-1  | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+products_db-1  | creating subdirectories ... ok
+products_db-1  | selecting dynamic shared memory implementation ... posix
+products_db-1  | selecting default max_connections ... 100
+products_db-1  | selecting default shared_buffers ... 128MB
+products_db-1  | selecting default time zone ... Etc/UTC
+products_db-1  | creating configuration files ... ok
+products_db-1  | running bootstrap script ... ok
+products_db-1  | performing post-bootstrap initialization ... ok
+products_db-1  | syncing data to disk ... ok
+products_db-1  | 
+products_db-1  | 
+products_db-1  | Success. You can now start the database server using:
+products_db-1  | 
+products_db-1  |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+products_db-1  | 
+products_db-1  | initdb: warning: enabling "trust" authentication for local connections
+products_db-1  | You can change this by editing pg_hba.conf or using the option -A, or
+products_db-1  | --auth-local and --auth-host, the next time you run initdb.
+products_db-1  | waiting for server to start....2026-02-25 17:51:40.143 UTC [47] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+products_db-1  | 2026-02-25 17:51:40.144 UTC [47] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+products_db-1  | 2026-02-25 17:51:40.150 UTC [48] LOG:  database system was shut down at 2026-02-25 17:51:39 UTC
+products_db-1  | 2026-02-25 17:51:40.155 UTC [47] LOG:  database system is ready to accept connections
+products_db-1  |  done
+products_db-1  | server started
+products_db-1  | CREATE DATABASE
+products_db-1  | 
+products_db-1  | 
+products_db-1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/00-init.sql
+products_db-1  | CREATE EXTENSION
+products_db-1  | 
+products_db-1  | 
+products_db-1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/01-seed-products.sql
+products_db-1  | CREATE TABLE
+products_db-1  | INSERT 0 8
+products_db-1  | 
+products_db-1  | 
+products_db-1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/02-seed-orders.sql
+products_db-1  | CREATE TABLE
+products_db-1  | CREATE TABLE
+products_db-1  | INSERT 0 3
+products_db-1  | INSERT 0 6
+products_db-1  | 
+products_db-1  | 
+products_db-1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init-database.sql
+products_db-1  | psql:/docker-entrypoint-initdb.d/init-database.sql:12: NOTICE:  Role setup done
+products_db-1  | DO
+products_db-1  | DO
+products_db-1  | DO
+products_db-1  | 
+products_db-1  | 
+products_db-1  | waiting for server to shut down....2026-02-25 17:51:40.569 UTC [47] LOG:  received fast shutdown request
+products_db-1  | 2026-02-25 17:51:40.572 UTC [47] LOG:  aborting any active transactions
+products_db-1  | 2026-02-25 17:51:40.573 UTC [47] LOG:  background worker "logical replication launcher" (PID 54) exited with exit code 1
+products_db-1  | 2026-02-25 17:51:40.573 UTC [49] LOG:  shutting down
+products_db-1  | 2026-02-25 17:51:40.599 UTC [47] LOG:  database system is shut down
+products_db-1  |  done
+products_db-1  | server stopped
+products_db-1  | 
+products_db-1  | PostgreSQL init process complete; ready for start up.
+products_db-1  | 
+products_db-1  | 2026-02-25 17:51:40.685 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+products_db-1  | 2026-02-25 17:51:40.685 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+products_db-1  | 2026-02-25 17:51:40.685 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+products_db-1  | 2026-02-25 17:51:40.687 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+products_db-1  | 2026-02-25 17:51:40.690 UTC [70] LOG:  database system was shut down at 2026-02-25 17:51:40 UTC
+products_db-1  | 2026-02-25 17:51:40.692 UTC [1] LOG:  database system is ready to accept connections
+products_db-1  | 2026-02-26 00:54:58.813 UTC [1] LOG:  received fast shutdown request
+products_db-1  | 2026-02-26 00:54:58.854 UTC [1] LOG:  aborting any active transactions
+products_db-1  | 2026-02-26 00:54:58.901 UTC [1] LOG:  background worker "logical replication launcher" (PID 76) exited with exit code 1
+products_db-1  | 2026-02-26 00:54:59.129 UTC [71] LOG:  shutting down

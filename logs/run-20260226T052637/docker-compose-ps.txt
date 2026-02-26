@@ -1,0 +1,11 @@
+time="2026-02-26T05:26:38-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+NAME                                                  IMAGE                                               COMMAND                  SERVICE           CREATED        STATUS                      PORTS
+modren-ordering-system-with-kafka-grafana-1           grafana/grafana                                     "/run.sh"                grafana           18 hours ago   Exited (0) 11 hours ago     
+modren-ordering-system-with-kafka-kafka-1             modren-ordering-system-with-kafka-kafka             "/etc/confluent/dock…"   kafka             18 hours ago   Exited (137) 11 hours ago   
+modren-ordering-system-with-kafka-my-ordering-app-1   modren-ordering-system-with-kafka-my-ordering-app   "docker-entrypoint.s…"   my-ordering-app   18 hours ago   Exited (137) 11 hours ago   
+modren-ordering-system-with-kafka-order-service-1     modren-ordering-system-with-kafka-order-service     "docker-entrypoint.s…"   order-service     18 hours ago   Exited (137) 11 hours ago   
+modren-ordering-system-with-kafka-orders_db-1         postgres:14                                         "docker-entrypoint.s…"   orders_db         18 hours ago   Exited (0) 11 hours ago     
+modren-ordering-system-with-kafka-product-service-1   modren-ordering-system-with-kafka-product-service   "docker-entrypoint.s…"   product-service   18 hours ago   Exited (137) 11 hours ago   
+modren-ordering-system-with-kafka-products_db-1       postgres:14                                         "docker-entrypoint.s…"   products_db       18 hours ago   Exited (137) 11 hours ago   
+modren-ordering-system-with-kafka-prometheus-1        prom/prometheus                                     "/bin/prometheus --c…"   prometheus        18 hours ago   Exited (0) 11 hours ago     
+modren-ordering-system-with-kafka-zookeeper-1         confluentinc/cp-zookeeper:7.0.1                     "/etc/confluent/dock…"   zookeeper         18 hours ago   Exited (137) 11 hours ago   

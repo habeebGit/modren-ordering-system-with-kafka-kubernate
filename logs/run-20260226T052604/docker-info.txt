@@ -1,0 +1,44 @@
+Client:
+ Version:    28.3.0
+ Context:    desktop-linux
+ Debug Mode: false
+ Plugins:
+  ai: Docker AI Agent - Ask Gordon (Docker Inc.)
+    Version:  v1.6.0
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-ai
+  buildx: Docker Buildx (Docker Inc.)
+    Version:  v0.25.0-desktop.1
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-buildx
+  cloud: Docker Cloud (Docker Inc.)
+    Version:  v0.4.2
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-cloud
+  compose: Docker Compose (Docker Inc.)
+    Version:  v2.38.1-desktop.1
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-compose
+  debug: Get a shell into any image or container (Docker Inc.)
+    Version:  0.0.41
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-debug
+  desktop: Docker Desktop commands (Docker Inc.)
+    Version:  v0.1.11
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-desktop
+  extension: Manages Docker extensions (Docker Inc.)
+    Version:  v0.2.29
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-extension
+  init: Creates Docker-related starter files for your project (Docker Inc.)
+    Version:  v1.4.0
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-init
+  mcp: Docker MCP Plugin (Docker Inc.)
+    Version:  v0.9.3
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-mcp
+  model: Docker Model Runner (EXPERIMENTAL) (Docker Inc.)
+    Version:  v0.1.32
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-model
+  sbom: View the packaged-based Software Bill Of Materials (SBOM) for an image (Anchore Inc.)
+    Version:  0.6.0
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-sbom
+  scout: Docker Scout (Docker Inc.)
+    Version:  v1.18.1
+    Path:     /Users/habeebmohammed/.docker/cli-plugins/docker-scout
+
+Server:
+Cannot connect to the Docker daemon at unix:///Users/habeebmohammed/.docker/run/docker.sock. Is the docker daemon running?

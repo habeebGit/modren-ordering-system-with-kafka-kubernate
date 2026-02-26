@@ -1,0 +1,53 @@
+time="2026-02-25T05:32:23-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+kafka-1  | ===> User
+kafka-1  | uid=1000(appuser) gid=1000(appuser) groups=1000(appuser)
+kafka-1  | ===> Configuring ...
+kafka-1  | ===> Running preflight checks ... 
+kafka-1  | ===> Check if /var/lib/kafka/data is writable ...
+kafka-1  | ===> Check if Zookeeper is healthy ...
+kafka-1  | SLF4J: Class path contains multiple SLF4J bindings.
+kafka-1  | SLF4J: Found binding in [jar:file:/usr/share/java/cp-base-new/slf4j-simple-1.7.30.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+kafka-1  | SLF4J: Found binding in [jar:file:/usr/share/java/cp-base-new/slf4j-log4j12-1.7.30.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+kafka-1  | SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+kafka-1  | SLF4J: Actual binding is of type [org.slf4j.impl.SimpleLoggerFactory]
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:zookeeper.version=3.6.3--6401e4ad2087061bc6b9f80dec2d69f2e3c8660a, built on 04/08/2021 16:35 GMT
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:host.name=57ee865d68c8
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:java.version=11.0.13
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:java.vendor=Azul Systems, Inc.
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:java.home=/usr/lib/jvm/zulu11-ca
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:java.class.path=/usr/share/java/cp-base-new/lz4-java-1.7.1.jar:/usr/share/java/cp-base-new/jackson-datatype-jdk8-2.12.3.jar:/usr/share/java/cp-base-new/scala-java8-compat_2.13-1.0.0.jar:/usr/share/java/cp-base-new/zstd-jni-1.5.0-2.jar:/usr/share/java/cp-base-new/jolokia-core-1.6.2.jar:/usr/share/java/cp-base-new/metrics-core-2.2.0.jar:/usr/share/java/cp-base-new/kafka-metadata-7.0.1-ccs.jar:/usr/share/java/cp-base-new/json-simple-1.1.1.jar:/usr/share/java/cp-base-new/kafka-raft-7.0.1-ccs.jar:/usr/share/java/cp-base-new/jackson-databind-2.12.3.jar:/usr/share/java/cp-base-new/slf4j-simple-1.7.30.jar:/usr/share/java/cp-base-new/kafka_2.13-7.0.1-ccs.jar:/usr/share/java/cp-base-new/kafka-server-common-7.0.1-ccs.jar:/usr/share/java/cp-base-new/metrics-core-4.1.12.1.jar:/usr/share/java/cp-base-new/snakeyaml-1.27.jar:/usr/share/java/cp-base-new/jackson-dataformat-csv-2.12.3.jar:/usr/share/java/cp-base-new/commons-cli-1.4.jar:/usr/share/java/cp-base-new/kafka-clients-7.0.1-ccs.jar:/usr/share/java/cp-base-new/confluent-log4j-1.2.17-cp2.jar:/usr/share/java/cp-base-new/scala-logging_2.13-3.9.3.jar:/usr/share/java/cp-base-new/paranamer-2.8.jar:/usr/share/java/cp-base-new/jmx_prometheus_javaagent-0.14.0.jar:/usr/share/java/cp-base-new/jackson-dataformat-yaml-2.12.3.jar:/usr/share/java/cp-base-new/kafka-storage-api-7.0.1-ccs.jar:/usr/share/java/cp-base-new/jackson-module-scala_2.13-2.12.3.jar:/usr/share/java/cp-base-new/scala-collection-compat_2.13-2.4.4.jar:/usr/share/java/cp-base-new/snappy-java-1.1.8.1.jar:/usr/share/java/cp-base-new/gson-2.8.6.jar:/usr/share/java/cp-base-new/jackson-annotations-2.12.3.jar:/usr/share/java/cp-base-new/slf4j-log4j12-1.7.30.jar:/usr/share/java/cp-base-new/disk-usage-agent-7.0.1.jar:/usr/share/java/cp-base-new/jopt-simple-5.0.4.jar:/usr/share/java/cp-base-new/slf4j-api-1.7.30.jar:/usr/share/java/cp-base-new/zookeeper-jute-3.6.3.jar:/usr/share/java/cp-base-new/jackson-core-2.12.3.jar:/usr/share/java/cp-base-new/scala-reflect-2.13.5.jar:/usr/share/java/cp-base-new/audience-annotations-0.5.0.jar:/usr/share/java/cp-base-new/kafka-storage-7.0.1-ccs.jar:/usr/share/java/cp-base-new/common-utils-7.0.1.jar:/usr/share/java/cp-base-new/argparse4j-0.7.0.jar:/usr/share/java/cp-base-new/jolokia-jvm-1.6.2-agent.jar:/usr/share/java/cp-base-new/zookeeper-3.6.3.jar:/usr/share/java/cp-base-new/utility-belt-7.0.1.jar:/usr/share/java/cp-base-new/scala-library-2.13.5.jar
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:java.library.path=/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:java.io.tmpdir=/tmp
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:java.compiler=<NA>
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:os.name=Linux
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:os.arch=amd64
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:os.version=6.10.14-linuxkit
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:user.name=appuser
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:user.home=/home/appuser
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:user.dir=/home/appuser
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:os.memory.free=117MB
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:os.memory.max=1960MB
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Client environment:os.memory.total=124MB
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Initiating client connection, connectString=zookeeper:2181 sessionTimeout=40000 watcher=io.confluent.admin.utils.ZookeeperConnectionWatcher@a7e666
+kafka-1  | [main] INFO org.apache.zookeeper.common.X509Util - Setting -D jdk.tls.rejectClientInitiatedRenegotiation=true to disable client-initiated TLS renegotiation
+kafka-1  | [main] INFO org.apache.zookeeper.ClientCnxnSocket - jute.maxbuffer value is 1048575 Bytes
+kafka-1  | [main] INFO org.apache.zookeeper.ClientCnxn - zookeeper.request.timeout value is 0. feature enabled=false
+kafka-1  | [main-SendThread(zookeeper:2181)] INFO org.apache.zookeeper.ClientCnxn - Opening socket connection to server zookeeper/172.18.0.3:2181.
+kafka-1  | [main-SendThread(zookeeper:2181)] INFO org.apache.zookeeper.ClientCnxn - SASL config status: Will not attempt to authenticate using SASL (unknown error)
+kafka-1  | [main-SendThread(zookeeper:2181)] INFO org.apache.zookeeper.ClientCnxn - Socket connection established, initiating session, client: /172.18.0.7:50392, server: zookeeper/172.18.0.3:2181
+kafka-1  | [main-SendThread(zookeeper:2181)] INFO org.apache.zookeeper.ClientCnxn - Session establishment complete on server zookeeper/172.18.0.3:2181, session id = 0x100001544630001, negotiated timeout = 40000
+kafka-1  | [main] INFO org.apache.zookeeper.ZooKeeper - Session: 0x100001544630001 closed
+kafka-1  | [main-EventThread] INFO org.apache.zookeeper.ClientCnxn - EventThread shut down for session: 0x100001544630001
+kafka-1  | ===> Launching ... 
+kafka-1  | ===> Launching kafka ... 
+kafka-1  | [2026-02-25 11:27:17,445] INFO Registered kafka:type=kafka.Log4jController MBean (kafka.utils.Log4jControllerRegistration$)
+kafka-1  | [2026-02-25 11:27:17,873] INFO Setting -D jdk.tls.rejectClientInitiatedRenegotiation=true to disable client-initiated TLS renegotiation (org.apache.zookeeper.common.X509Util)
+kafka-1  | [2026-02-25 11:27:17,927] ERROR Exiting Kafka due to fatal exception (kafka.Kafka$)
+kafka-1  | java.lang.IllegalArgumentException: requirement failed: advertised.listeners listener names must be equal to or a subset of the ones defined in listeners. Found PLAINTEXT,PLAINTEXT_HOST. The valid options based on the current configuration are PLAINTEXT
+kafka-1  | 	at scala.Predef$.require(Predef.scala:337)
+kafka-1  | 	at kafka.server.KafkaConfig.validateValues(KafkaConfig.scala:1956)
+kafka-1  | 	at kafka.server.KafkaConfig.<init>(KafkaConfig.scala:1897)
+kafka-1  | 	at kafka.server.KafkaConfig.<init>(KafkaConfig.scala:1394)
+kafka-1  | 	at kafka.Kafka$.buildServer(Kafka.scala:67)
+kafka-1  | 	at kafka.Kafka$.main(Kafka.scala:87)
+kafka-1  | 	at kafka.Kafka.main(Kafka.scala)

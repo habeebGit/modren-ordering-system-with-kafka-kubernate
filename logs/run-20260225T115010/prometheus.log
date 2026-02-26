@@ -1,0 +1,33 @@
+time=2026-02-25T11:40:01.071Z level=INFO source=main.go:1549 msg="updated GOGC" old=100 new=75
+time=2026-02-25T11:40:01.071Z level=INFO source=main.go:680 msg="Leaving GOMAXPROCS=12: CPU quota undefined" component=automaxprocs
+time=2026-02-25T11:40:01.072Z level=INFO source=memlimit.go:198 msg="GOMEMLIMIT is updated" component=automemlimit package=github.com/KimMachineGun/automemlimit/memlimit GOMEMLIMIT=7395976396 previous=9223372036854775807
+time=2026-02-25T11:40:01.072Z level=INFO source=main.go:722 msg="No time or size retention was set so using the default time retention" duration=15d
+time=2026-02-25T11:40:01.072Z level=INFO source=main.go:773 msg="Starting Prometheus Server" mode=server version="(version=3.7.1, branch=HEAD, revision=0aeb4fddc93b64e4e95104d5e8ea8b55ad36fb61)"
+time=2026-02-25T11:40:01.072Z level=INFO source=main.go:778 msg="operational information" build_context="(go=go1.25.3, platform=linux/arm64, user=root@54bf11233185, date=20251017-06:35:17, tags=netgo,builtinassets)" host_details="(Linux 6.10.14-linuxkit #1 SMP Sat May 17 08:28:57 UTC 2025 aarch64 09df80b8b90c (none))" fd_limits="(soft=1048576, hard=1048576)" vm_limits="(soft=unlimited, hard=unlimited)"
+time=2026-02-25T11:40:01.076Z level=INFO source=web.go:660 msg="Start listening for connections" component=web address=0.0.0.0:9090
+time=2026-02-25T11:40:01.080Z level=INFO source=main.go:1293 msg="Starting TSDB ..."
+time=2026-02-25T11:40:01.082Z level=INFO source=tls_config.go:346 msg="Listening on" component=web address=[::]:9090
+time=2026-02-25T11:40:01.082Z level=INFO source=tls_config.go:349 msg="TLS is disabled." component=web http2=false address=[::]:9090
+time=2026-02-25T11:40:01.086Z level=INFO source=head.go:669 msg="Replaying on-disk memory mappable chunks if any" component=tsdb
+time=2026-02-25T11:40:01.087Z level=INFO source=head.go:755 msg="On-disk memory mappable chunks replay completed" component=tsdb duration=12.375µs
+time=2026-02-25T11:40:01.087Z level=INFO source=head.go:763 msg="Replaying WAL, this may take a while" component=tsdb
+time=2026-02-25T11:40:01.087Z level=INFO source=head.go:836 msg="WAL segment loaded" component=tsdb segment=0 maxSegment=0 duration=251.292µs
+time=2026-02-25T11:40:01.087Z level=INFO source=head.go:873 msg="WAL replay completed" component=tsdb checkpoint_replay_duration=20.209µs wal_replay_duration=273.291µs wbl_replay_duration=125ns chunk_snapshot_load_duration=0s mmap_chunk_replay_duration=12.375µs total_replay_duration=323.75µs
+time=2026-02-25T11:40:01.088Z level=INFO source=main.go:1314 msg="filesystem information" fs_type=EXT4_SUPER_MAGIC
+time=2026-02-25T11:40:01.088Z level=INFO source=main.go:1317 msg="TSDB started"
+time=2026-02-25T11:40:01.088Z level=INFO source=main.go:1502 msg="Loading configuration file" filename=/etc/prometheus/prometheus.yml
+time=2026-02-25T11:40:01.089Z level=INFO source=main.go:1542 msg="Completed loading of configuration file" db_storage=1.208µs remote_storage=1.125µs web_handler=542ns query_engine=875ns scrape=522.542µs scrape_sd=50.875µs notify=1.166µs notify_sd=1.917µs rules=1.458µs tracing=18.167µs filename=/etc/prometheus/prometheus.yml totalDuration=1.17075ms
+time=2026-02-25T11:40:01.089Z level=INFO source=main.go:1278 msg="Server is ready to receive web requests."
+time=2026-02-25T11:40:01.090Z level=INFO source=manager.go:190 msg="Starting rule manager..." component="rule manager"
+time=2026-02-25T15:13:57.531Z level=INFO source=compact.go:565 msg="write block started" component=tsdb mint=1772019619471 maxt=1772020800000 ulid=01KJANTB8R3HQGE3AQ86661B74
+time=2026-02-25T15:13:57.580Z level=INFO source=compact.go:599 msg="write block completed" component=tsdb mint=1772019619471 maxt=1772020800000 ulid=01KJANTB8R3HQGE3AQ86661B74 duration=52.607458ms ooo=false
+time=2026-02-25T15:13:57.581Z level=INFO source=head.go:1420 msg="Head GC started" component=tsdb caller=truncateMemory
+time=2026-02-25T15:13:57.583Z level=INFO source=head.go:1424 msg="Head GC completed" component=tsdb caller=truncateMemory duration=938.292µs
+time=2026-02-25T15:13:57.583Z level=INFO source=compact.go:565 msg="write block started" component=tsdb mint=1772020804480 maxt=1772028000000 ulid=01KJANTBAF9VDVC333ZCC311PZ
+time=2026-02-25T15:13:57.592Z level=INFO source=compact.go:599 msg="write block completed" component=tsdb mint=1772020804480 maxt=1772028000000 ulid=01KJANTBAF9VDVC333ZCC311PZ duration=9.562916ms ooo=false
+time=2026-02-25T15:13:57.592Z level=INFO source=head.go:1420 msg="Head GC started" component=tsdb caller=truncateMemory
+time=2026-02-25T15:13:57.593Z level=INFO source=head.go:1424 msg="Head GC completed" component=tsdb caller=truncateMemory duration=1.005125ms
+time=2026-02-25T17:15:43.617Z level=INFO source=compact.go:565 msg="write block started" component=tsdb mint=1772028775099 maxt=1772035200000 ulid=01KJAWSA412YT3SMF4CG0TE4YQ
+time=2026-02-25T17:15:43.647Z level=INFO source=compact.go:599 msg="write block completed" component=tsdb mint=1772028775099 maxt=1772035200000 ulid=01KJAWSA412YT3SMF4CG0TE4YQ duration=30.281709ms ooo=false
+time=2026-02-25T17:15:43.648Z level=INFO source=head.go:1420 msg="Head GC started" component=tsdb caller=truncateMemory
+time=2026-02-25T17:15:43.650Z level=INFO source=head.go:1424 msg="Head GC completed" component=tsdb caller=truncateMemory duration=1.716083ms

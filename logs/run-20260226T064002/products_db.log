@@ -1,0 +1,138 @@
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/postgresql/data ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... Etc/UTC
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+initdb: warning: enabling "trust" authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+syncing data to disk ... ok
+
+
+Success. You can now start the database server using:
+
+    pg_ctl -D /var/lib/postgresql/data -l logfile start
+
+waiting for server to start....2026-02-26 11:27:19.763 UTC [47] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-02-26 11:27:19.769 UTC [47] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-02-26 11:27:19.774 UTC [48] LOG:  database system was shut down at 2026-02-26 11:27:19 UTC
+2026-02-26 11:27:19.778 UTC [47] LOG:  database system is ready to accept connections
+ done
+server started
+CREATE DATABASE
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/00-init.sql
+CREATE EXTENSION
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/01-seed-products.sql
+CREATE TABLE
+INSERT 0 8
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/02-seed-orders.sql
+CREATE TABLE
+CREATE TABLE
+INSERT 0 3
+INSERT 0 6
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init-database.sql
+DO
+psql:/docker-entrypoint-initdb.d/init-database.sql:12: NOTICE:  Role setup done
+DO
+DO
+
+
+waiting for server to shut down....2026-02-26 11:27:20.081 UTC [47] LOG:  received fast shutdown request
+2026-02-26 11:27:20.082 UTC [47] LOG:  aborting any active transactions
+2026-02-26 11:27:20.083 UTC [47] LOG:  background worker "logical replication launcher" (PID 54) exited with exit code 1
+2026-02-26 11:27:20.083 UTC [49] LOG:  shutting down
+2026-02-26 11:27:20.111 UTC [47] LOG:  database system is shut down
+ done
+server stopped
+
+PostgreSQL init process complete; ready for start up.
+
+2026-02-26 11:27:20.195 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-02-26 11:27:20.195 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-02-26 11:27:20.195 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-02-26 11:27:20.199 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-02-26 11:27:20.203 UTC [70] LOG:  database system was shut down at 2026-02-26 11:27:20 UTC
+2026-02-26 11:27:20.206 UTC [1] LOG:  database system is ready to accept connections
+2026-02-26 11:28:36.838 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:36.838 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:28:36.844 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:36.844 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:28:43.110 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:43.110 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:28:43.116 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:43.116 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:28:44.105 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:44.105 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:28:44.111 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:44.111 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:28:46.432 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:46.432 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:28:46.434 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:46.434 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:28:48.240 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:48.240 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:28:48.245 UTC [103] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:28:48.245 UTC [103] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:30:36.696 UTC [141] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:30:36.696 UTC [141] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:49:24.356 UTC [223] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:49:24.356 UTC [223] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:50:22.303 UTC [243] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:50:22.303 UTC [243] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:50:32.172 UTC [243] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:50:32.172 UTC [243] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:54:28.401 UTC [317] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:54:28.401 UTC [317] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:57:06.450 UTC [364] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:57:06.450 UTC [364] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 11:57:06.456 UTC [363] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 11:57:06.456 UTC [363] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 12:00:53.970 UTC [437] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 12:00:53.970 UTC [437] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 12:02:02.746 UTC [462] ERROR:  relation "Products" does not exist at character 51
+2026-02-26 12:02:02.746 UTC [462] STATEMENT:  SELECT id,"name",price,stock,"reservedStock" FROM "Products" ORDER BY id;
+2026-02-26 12:05:16.373 UTC [551] ERROR:  column "reservedstock" does not exist at character 32
+2026-02-26 12:05:16.373 UTC [551] STATEMENT:  SELECT id, name, price, stock, reservedstock FROM products ORDER BY id;
+2026-02-26 12:11:52.857 UTC [712] ERROR:  relation "Products" does not exist at character 98
+2026-02-26 12:11:52.857 UTC [712] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedStock", "version", "createdAt", "updatedAt" FROM "Products" AS "Product";
+2026-02-26 12:15:11.060 UTC [768] ERROR:  column "reserved_stock" does not exist at character 40
+2026-02-26 12:15:11.060 UTC [768] HINT:  Perhaps you meant to reference the column "Product.reservedstock".
+2026-02-26 12:15:11.060 UTC [768] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "version", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-02-26 12:17:46.645 UTC [830] ERROR:  column "version" does not exist at character 77
+2026-02-26 12:17:46.645 UTC [830] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "version", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-02-26 12:21:25.994 UTC [901] ERROR:  column "version" does not exist at character 77
+2026-02-26 12:21:25.994 UTC [901] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "version", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-02-26 12:25:02.049 UTC [965] ERROR:  column "version" does not exist at character 77
+2026-02-26 12:25:02.049 UTC [965] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "version", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-02-26 12:25:27.358 UTC [975] ERROR:  column "version" does not exist at character 77
+2026-02-26 12:25:27.358 UTC [975] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "version", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-02-26 12:27:56.997 UTC [1021] ERROR:  column "reservedstock" does not exist at character 40
+2026-02-26 12:27:56.997 UTC [1021] HINT:  Perhaps you meant to reference the column "Product.reserved_stock".
+2026-02-26 12:27:56.997 UTC [1021] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedstock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-02-26 12:29:28.887 UTC [1050] ERROR:  column "reservedstock" does not exist at character 40
+2026-02-26 12:29:28.887 UTC [1050] HINT:  Perhaps you meant to reference the column "Product.reserved_stock".
+2026-02-26 12:29:28.887 UTC [1050] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedstock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-02-26 12:31:28.429 UTC [1088] ERROR:  column "reservedstock" does not exist at character 40
+2026-02-26 12:31:28.429 UTC [1088] HINT:  Perhaps you meant to reference the column "Product.reserved_stock".
+2026-02-26 12:31:28.429 UTC [1088] STATEMENT:  SELECT "id", "name", "price", "stock", "reservedstock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";

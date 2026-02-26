@@ -1,0 +1,18 @@
+
+> product-service@1.0.0 start
+> node index.js
+
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+{"level":"WARN","timestamp":"2026-02-26T12:37:28.424Z","logger":"kafkajs","message":"KafkaJS v2.0.0 switched default partitioner. To retain the same partitioning behavior as in previous versions, create the producer with the option \"createPartitioner: Partitioners.LegacyPartitioner\". See the migration guide at https://kafka.js.org/docs/migration-guide-v2.0.0#producer-new-default-partitioner for details. Silence this warning by setting the environment variable \"KAFKAJS_NO_PARTITIONER_WARNING=1\""}
+Product service listening at http://localhost:3002
+Creating new Kafka consumer instance (attempt 1)
+Kafka producer connected for product-service (attempt 1)
+Kafka consumer connected (attempt 1)
+{"level":"INFO","timestamp":"2026-02-26T12:37:28.457Z","logger":"kafkajs","message":"[Consumer] Starting","groupId":"product-group"}
+Executing (default): INSERT INTO "products" ("id","name","price","stock","reserved_stock","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","name","price","stock","reserved_stock","created_at","updated_at";
+{"level":"INFO","timestamp":"2026-02-26T12:37:52.334Z","logger":"kafkajs","message":"[ConsumerGroup] Consumer has joined the group","groupId":"product-group","memberId":"kafkajs-4c521aac-eb40-4716-a347-7adb21543fde","leaderId":"kafkajs-4c521aac-eb40-4716-a347-7adb21543fde","isLeader":true,"memberAssignment":{"order-events":[0]},"groupProtocol":"RoundRobinAssigner","duration":23877}
+Kafka consumer started successfully
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): INSERT INTO "products" ("id","name","price","stock","reserved_stock","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","name","price","stock","reserved_stock","created_at","updated_at";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";

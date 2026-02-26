@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Run tests for all services
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Run order-service tests
+        working-directory: ./order-service
+        run: |
+          npm ci
+          npm test
+
+      - name: Run product-service tests
+        working-directory: ./product-service
+        run: |
+          npm ci
+          npm test
+
+      - name: Run my-ordering-app tests
+        working-directory: ./my-ordering-app
+        run: |
+          npm ci
+          npm test || true
+
+      - name: Run workspace api-gateway tests
+        working-directory: ./workspace-root/api-gateway
+        run: |
+          npm ci
+          npm test || true
+
+      - name: Collect and upload runtime logs (if any)
+        if: always()
+        run: |
+          echo "Collecting logs via shutdown script (no volumes removal)"
+          chmod +x ./scripts/shutdown.sh || true
+          # Attempt to collect logs and archive; ignore errors
+          ./scripts/shutdown.sh --no-remove-volumes --logs-dir ./ci-logs || true
+          # Find archive that script created
+          ARCHIVE=$(ls -1 logs-*.tar.gz 2>/dev/null | tail -n 1 || true)
+          if [ -n "$ARCHIVE" ]; then
+            echo "Found archive: $ARCHIVE"
+            mkdir -p artifacts
+            mv "$ARCHIVE" artifacts/ || true
+          else
+            echo "No logs archive found, creating empty artifact placeholder"
+            mkdir -p artifacts
+            touch artifacts/empty
+          fi
+        shell: bash
+
+      - name: Upload logs artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-logs
+          path: artifacts/
+          retention-days: 7

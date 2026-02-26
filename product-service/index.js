@@ -4,11 +4,19 @@ const { Sequelize, DataTypes } = require('sequelize');
 const { Kafka } = require('kafkajs');
 const axios = require('axios');
 const cors = require('cors');
+const { v4: uuidv4 } = require('uuid');
+const message = require('./lib/message');
+const dns = require('node:dns').promises;
 const app = express();
 const port = 3002;
 
 app.use(cors());
 app.use(express.json());
+
+// Lightweight liveness endpoint - register early so healthchecks succeed while startup tasks run
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
 
 // Database connection
 const sequelize = new Sequelize(
@@ -17,16 +25,22 @@ const sequelize = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: 'postgres'
+    dialect: 'postgres',
+    define: {
+      underscored: true, // map camelCase (createdAt) to snake_case (created_at)
+    }
   }
 );
 
 // Product Model with proper stock management
 const Product = sequelize.define('Product', {
     name: { type: DataTypes.STRING, allowNull: false },
+    price: { type: DataTypes.FLOAT, defaultValue: 0 },
     stock: { type: DataTypes.INTEGER, defaultValue: 0 },
-    reservedStock: { type: DataTypes.INTEGER, defaultValue: 0 }, // Track reserved stock
-    version: { type: DataTypes.INTEGER, defaultValue: 1 } // For optimistic locking
+    reservedStock: { type: DataTypes.INTEGER, defaultValue: 0, field: 'reserved_stock' } // Track reserved stock (maps to existing DB column)
+}, {
+    tableName: 'products',
+    // timestamps are true by default; underscored option above maps createdAt -> created_at
 });
 
 // Stock Reservation Model for tracking reservations
@@ -53,42 +67,60 @@ Product.hasMany(StockReservation);
 StockReservation.belongsTo(Product);
 
 // Kafka setup
-const kafka = new Kafka({ brokers: ['kafka:9092'] });
-const consumer = kafka.consumer({ groupId: 'product-group' });
+const kafka = new Kafka({ brokers: (process.env.KAFKA_BROKERS || 'kafka:9092').split(',') });
+let consumer = null; // created lazily to avoid double-subscribe on retries
+let consumerRunning = false;
 const producer = kafka.producer();
+
+const kafkaBrokers = (process.env.KAFKA_BROKERS || 'kafka:9092').split(',');
+
+async function waitForBrokers(brokers, timeoutMs = 120000) {
+  const hosts = brokers.map(b => b.split(':')[0]);
+  const start = Date.now();
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  while (Date.now() - start < timeoutMs) {
+    try {
+      for (const host of hosts) {
+        await dns.lookup(host);
+      }
+      return true;
+    } catch (error_) {
+      console.log('Waiting for Kafka broker DNS to resolve', { error: error_.code || error_.message });
+      await delay(2000);
+    }
+  }
+  throw new Error('Timed out waiting for Kafka brokers to be resolvable');
+}
 
 // Kafka event sending with retry logic
 async function sendStockEventWithRetry(event, retries = 3) {
-    const messageId = `${event.eventType}-${event.orderId}-${Date.now()}`;
     let attempt = 0;
-    
+
     while (attempt < retries) {
         try {
-            await producer.connect();
             await producer.send({
                 topic: 'order-events',
-                messages: [{ 
-                    key: event.orderId.toString(),
-                    value: JSON.stringify({ 
-                        messageId,
-                        eventType: event.eventType,
-                        event,
-                        timestamp: new Date().toISOString()
-                    }) 
+                messages: [{
+                    key: event.orderId ? event.orderId.toString() : undefined,
+                    value: message.stringifyEnvelope(event.eventType, event)
                 }]
             });
-            await producer.disconnect();
-            console.log('Stock event sent successfully', { messageId, eventType: event.eventType });
+            console.log('Stock event sent successfully', { eventType: event.eventType });
             return;
         } catch (err) {
             attempt++;
-            console.warn(`Stock event send attempt ${attempt} failed`, { messageId, error: err.message });
+            console.warn(`Stock event send attempt ${attempt} failed`, { error: err.message });
             if (attempt === retries) {
-                console.error('Stock event failed after retries', { 
-                    messageId, 
-                    event, 
-                    error: err.message 
+                console.error('Stock event failed after retries', {
+                    event,
+                    error: err.message
                 });
+                // Optionally persist to dead-letter store (not implemented here)
+            } else {
+                // backoff
+                const backoffMs = Math.min(2000, Math.pow(2, attempt) * 100) + Math.floor(Math.random() * 100);
+                await new Promise(resolve => setTimeout(resolve, backoffMs));
             }
         }
     }
@@ -96,52 +128,114 @@ async function sendStockEventWithRetry(event, retries = 3) {
 
 // Kafka consumer for order events with proper event handling
 const consumeOrderEvents = async () => {
-    await consumer.connect();
-    await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
-    await consumer.run({
-        eachMessage: async ({ message }) => {
-            try {
-                const { messageId, eventType, event } = JSON.parse(message.value.toString());
-                
-                // Implement idempotency check
-                const processedEvent = await ProcessedEvent.findByPk(messageId);
-                if (processedEvent) {
-                    console.log('Event already processed, skipping', { messageId, eventType });
-                    return;
-                }
+    if (!consumer) throw new Error('Consumer not initialized');
+    if (consumerRunning) {
+        console.log('Consumer already running, skipping consumeOrderEvents');
+        return;
+    }
 
-                switch (eventType) {
-                    case 'ORDER_CREATED':
-                        // This is handled by the reserve-stock endpoint call
-                        console.log('Order created event received', { orderId: event.orderId });
-                        break;
+    // Try to subscribe; handle race where a previous consumer instance might still be active
+    try {
+        await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
+    } catch (subErr) {
+        // If the consumer is already running in another instance, log and continue
+        if (String(subErr).includes('Cannot subscribe to topic while consumer is running')) {
+            console.warn('Subscribe race detected - consumer already running elsewhere, continuing to run handler');
+        } else {
+            throw subErr;
+        }
+    }
+
+    // Mark as running before starting the message loop to avoid races
+    consumerRunning = true;
+
+    // Only start the run loop if not already active
+    try {
+        await consumer.run({
+            eachMessage: async ({ message: kafkaMessage }) => {
+                try {
+                    const envelope = message.parseEnvelope(kafkaMessage.value);
+                    if (!envelope) {
+                        console.log('Received invalid message envelope');
+                        return;
+                    }
+                    const { messageId, eventType, payload } = envelope;
                     
-                    case 'ORDER_CANCELLED':
-                        // Release reserved stock
-                        await releaseStockForOrder(event.orderId);
-                        break;
-                    
-                    case 'ORDER_PAID':
-                        // Confirm stock reservation
-                        await confirmStockForOrder(event.orderId);
-                        break;
+                    // Implement idempotency check
+                    const processedEvent = await ProcessedEvent.findByPk(messageId);
+                    if (processedEvent) {
+                        console.log('Event already processed, skipping', { messageId, eventType });
+                        return;
+                    }
+
+                    switch (eventType) {
+                        case 'ORDER_CREATED':
+                            // This is handled by the reserve-stock endpoint call
+                            console.log('Order created event received', { orderId: payload.orderId });
+                            break;
                         
-                    default:
-                        console.warn('Unknown event type received', { eventType, event });
+                        case 'ORDER_CANCELLED':
+                            // Release reserved stock
+                            await releaseStockForOrder(payload.orderId);
+                            break;
+                        
+                        case 'ORDER_PAID':
+                            // Confirm stock reservation
+                            await confirmStockForOrder(payload.orderId);
+                            break;
+                            
+                        default:
+                            console.warn('Unknown event type received', { eventType, payload });
+                    }
+
+                    // Mark event as processed
+                    await ProcessedEvent.create({ 
+                        id: messageId, 
+                        eventType, 
+                        processedAt: new Date() 
+                    });
+
+                } catch (error) {
+                    console.error('Error processing order event:', error);
                 }
+            },
+        });
+    } catch (runErr) {
+        // If run fails, clear running flag so retry logic can attempt again
+        consumerRunning = false;
+        throw runErr;
+    }
+};
 
-                // Mark event as processed
-                await ProcessedEvent.create({ 
-                    id: messageId, 
-                    eventType, 
-                    processedAt: new Date() 
-                });
+// Helper to stop and cleanup consumer
+const stopConsumer = async () => {
+  if (!consumer) return;
+  console.log('Stopping existing Kafka consumer...');
+  try {
+    // If the run loop is active, stop it first (KafkaJS consumer.stop exists)
+    if (consumerRunning && typeof consumer.stop === 'function') {
+      try {
+        await consumer.stop();
+        console.log('Consumer run loop stopped');
+      } catch (e) {
+        console.warn('Error while stopping consumer run loop', { error: e && e.message });
+      }
+    }
 
-            } catch (error) {
-                console.error('Error processing order event:', error);
-            }
-        },
-    });
+    // Always attempt a disconnect to close the consumer session
+    try {
+      await consumer.disconnect();
+      console.log('Consumer disconnected');
+    } catch (e) {
+      console.warn('Error while disconnecting consumer', { error: e && e.message });
+    }
+  } finally {
+    consumer = null;
+    consumerRunning = false;
+    // longer delay to allow network sessions/resources to fully release before recreating
+    await new Promise(r => setTimeout(r, 1000));
+    console.log('Consumer cleanup complete, proceeding to next attempt');
+  }
 };
 
 // Helper function to release stock for cancelled orders
@@ -157,8 +251,7 @@ async function releaseStockForOrder(orderId) {
         for (const reservation of reservations) {
             const product = reservation.Product;
             await product.update({
-                reservedStock: product.reservedStock - reservation.quantity,
-                version: product.version + 1
+                reservedStock: product.reservedStock - reservation.quantity
             }, { transaction });
             
             await reservation.update({ status: 'RELEASED' }, { transaction });
@@ -187,8 +280,7 @@ async function confirmStockForOrder(orderId) {
             const product = reservation.Product;
             await product.update({
                 stock: product.stock - reservation.quantity,
-                reservedStock: product.reservedStock - reservation.quantity,
-                version: product.version + 1
+                reservedStock: product.reservedStock - reservation.quantity
             }, { transaction });
             
             await reservation.update({ status: 'CONFIRMED' }, { transaction });
@@ -211,17 +303,65 @@ app.get('/products', async (req, res) => {
     const productsWithAvailableStock = products.map(product => ({
       id: product.id,
       name: product.name,
-      totalStock: product.stock,
+      price: product.price,
+      stock: product.stock,
       reservedStock: product.reservedStock,
-      availableStock: product.stock - product.reservedStock,
+      availableStock: product.stock - (product.reservedStock || 0),
       createdAt: product.createdAt,
       updatedAt: product.updatedAt
     }));
     
     res.json(productsWithAvailableStock);
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ message: 'Error fetching products' });
+    console.error('Error fetching products:', error && error.stack ? error.stack : error);
+    res.status(500).json({ message: 'Error fetching products', error: error && error.message ? error.message : String(error) });
+  }
+});
+
+// Create a new product (used by Admin frontend form)
+app.post('/products', async (req, res) => {
+  try {
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ error: 'Request body is required' });
+    }
+
+    const { name, price, stock } = req.body;
+
+    if (!name || String(name).trim() === '') {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+
+    const parsedPrice = Number(price);
+    if (Number.isNaN(parsedPrice) || parsedPrice <= 0) {
+      return res.status(400).json({ error: 'Valid price is required' });
+    }
+
+    const parsedStock = Number.isInteger(Number(stock)) ? Number(stock) : 0;
+    if (parsedStock < 0) {
+      return res.status(400).json({ error: 'Stock must be >= 0' });
+    }
+
+    const product = await Product.create({
+      name: String(name).trim(),
+      price: parsedPrice,
+      stock: parsedStock,
+      reservedStock: 0
+    });
+
+    res.status(201).json({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      stock: product.stock,
+      reservedStock: product.reservedStock,
+      availableStock: product.stock - product.reservedStock,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt
+    });
+  } catch (error) {
+    // Log full stack if available and return error details to aid debugging in dev
+    console.error('Error creating product:', error && error.stack ? error.stack : error);
+    res.status(500).json({ error: 'Failed to create product', details: error && error.message ? error.message : String(error) });
   }
 });
 
@@ -274,11 +414,9 @@ app.post('/reserve-stock', async (req, res) => {
             
             // Reserve the stock
             await product.update({ 
-                reservedStock: product.reservedStock + quantity,
-                version: product.version + 1
+                reservedStock: product.reservedStock + quantity
             }, { 
-                transaction,
-                where: { version: product.version } // Optimistic locking
+                transaction
             });
             
             // Create reservation record
@@ -347,8 +485,7 @@ app.post('/confirm-stock/:orderId', async (req, res) => {
             // Move from reserved to actual stock deduction
             await product.update({
                 stock: product.stock - reservation.quantity,
-                reservedStock: product.reservedStock - reservation.quantity,
-                version: product.version + 1
+                reservedStock: product.reservedStock - reservation.quantity
             }, { transaction });
             
             // Mark reservation as confirmed
@@ -383,8 +520,7 @@ app.post('/release-stock/:orderId', async (req, res) => {
             
             // Release reserved stock
             await product.update({
-                reservedStock: product.reservedStock - reservation.quantity,
-                version: product.version + 1
+                reservedStock: product.reservedStock - reservation.quantity
             }, { transaction });
             
             // Mark reservation as released
@@ -408,11 +544,11 @@ async function cleanupExpiredReservations() {
         const expiredReservations = await StockReservation.findAll({
             where: {
                 status: 'RESERVED',
-                expiresAt: { [sequelize.Op.lt]: new Date() }
+                expiresAt: { [Sequelize.Op.lt]: new Date() }
             },
             include: [Product]
         });
-        
+
         for (const reservation of expiredReservations) {
             const transaction = await sequelize.transaction();
             try {
@@ -420,8 +556,7 @@ async function cleanupExpiredReservations() {
                 
                 // Release the reserved stock
                 await product.update({
-                    reservedStock: product.reservedStock - reservation.quantity,
-                    version: product.version + 1
+                    reservedStock: product.reservedStock - reservation.quantity
                 }, { transaction });
                 
                 // Mark reservation as released
@@ -451,48 +586,82 @@ const startKafkaConsumer = async () => {
   }
   
   try {
-    await consumeOrderEvents();
-    console.log('Kafka consumer started successfully');
-  } catch (error) {
-    console.error('Error starting Kafka consumer:', error);
-    throw error;
+    // Wait for brokers to resolve before attempting connections
+    try {
+      await waitForBrokers(kafkaBrokers, 120000);
+    } catch (error_) {
+      console.warn('Kafka brokers did not resolve in time, will attempt connects and rely on client retries', { error: error_.message });
+    }
+
+    // Try to connect producer and consumer with retries
+    const maxAttempts = 8;
+    let backoffBase = 500;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        // Ensure any previous consumer is fully stopped before creating a new one
+        if (consumer) {
+          console.log('Existing consumer detected before attempt', attempt, '- stopping it first');
+          try { await stopConsumer(); } catch (e) { console.warn('Error stopping previous consumer', { error: e && e.message }); }
+        }
+        console.log('Creating new Kafka consumer instance (attempt', attempt + ')');
+        consumer = kafka.consumer({ groupId: 'product-group' });
+
+        // Connect producer (idempotent) and consumer
+        await producer.connect();
+        console.log('Kafka producer connected for product-service (attempt', attempt + ')');
+
+        await consumer.connect();
+        console.log('Kafka consumer connected (attempt', attempt + ')');
+        // Start consuming (subscribe + run) only once per consumer instance
+        await consumeOrderEvents();
+
+        console.log('Kafka consumer started successfully');
+        break;
+      } catch (err) {
+        // On error, ensure we clean up the consumer before retrying
+        try { await stopConsumer(); } catch (e) { /* ignore cleanup errors */ }
+
+        const backoff = Math.min(30000, backoffBase * Math.pow(2, attempt));
+        console.warn(`Attempt ${attempt} to start Kafka client failed, retrying in ${backoff}ms`, { error: err.message });
+        if (attempt === maxAttempts) {
+          console.error('Failed to start Kafka consumer after retries', { error: err.message });
+          throw err;
+        }
+        await new Promise(r => setTimeout(r, backoff));
+      }
+    }
+  } catch (error_) {
+    console.error('Error starting Kafka consumer:', error_);
+    throw error_;
   }
 };
 
-// Start service with cleanup job
-const start = async () => {
+// Start the Kafka consumer on service startup. Make startup non-fatal so the HTTP
+// endpoints (e.g. /products) remain available even if Kafka is down. Retry in
+// background every 30s instead of exiting the process.
+(async () => {
   try {
-    await sequelize.authenticate();
-    console.log('Database connected successfully');
-    
-    await sequelize.sync({ alter: true });
-    console.log('Database synced');
-
     await startKafkaConsumer();
-    
-    // Start cleanup job for expired reservations (only in production)
-    if (process.env.NODE_ENV !== 'test') {
-      setInterval(cleanupExpiredReservations, 5 * 60 * 1000); // Every 5 minutes
-      app.listen(port, () => console.log(`Product Service running on port ${port}`));
-    }
-  } catch (error) {
-    console.error('Startup error:', error);
-    // Don't exit in test environment
-    if (process.env.NODE_ENV !== 'test') {
-      process.exit(1);
-    }
+  } catch (err) {
+    console.error('Non-fatal: Failed to start Kafka consumer on startup; continuing without consumer.', err && err.message ? err.message : err);
+
+    // Retry in the background periodically
+    const retryIntervalMs = 30 * 1000;
+    setInterval(async () => {
+      try {
+        console.log('Retrying to start Kafka consumer...');
+        await startKafkaConsumer();
+      } catch (e) {
+        console.warn('Retry to start Kafka consumer failed:', e && e.message ? e.message : e);
+      }
+    }, retryIntervalMs);
   }
-};
+})();
 
-// Only start if not in test mode
-if (process.env.NODE_ENV !== 'test') {
-  start();
-}
+// Periodic cleanup of expired reservations
+setInterval(cleanupExpiredReservations, 5 * 60 * 1000); // Every 5 minutes
 
-// Export the app for testing
-module.exports = app;
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+app.listen(port, () => {
+  console.log(`Product service listening at http://localhost:${port}`);
 });
 

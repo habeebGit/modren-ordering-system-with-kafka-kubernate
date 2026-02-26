@@ -1,0 +1,13 @@
+
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+
+2026-02-25 10:39:25.997 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-02-25 10:39:25.997 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-02-25 10:39:25.997 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-02-25 10:39:26.001 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-02-25 10:39:26.010 UTC [25] LOG:  database system shutdown was interrupted; last known up at 2025-11-07 16:43:37 UTC
+2026-02-25 10:39:26.443 UTC [25] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-02-25 10:39:26.444 UTC [25] LOG:  redo starts at 0/17BFFE8
+2026-02-25 10:39:26.444 UTC [25] LOG:  invalid record length at 0/17C00E8: wanted 24, got 0
+2026-02-25 10:39:26.444 UTC [25] LOG:  redo done at 0/17C00B0 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-02-25 10:39:26.458 UTC [1] LOG:  database system is ready to accept connections

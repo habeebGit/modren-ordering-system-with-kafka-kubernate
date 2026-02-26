@@ -15,3 +15,14 @@ test-product-service:
 
 clean:
     docker-compose down -v
+
+.PHONY: smoke start-and-smoke
+
+smoke:
+	@echo "Running post-startup smoke tests..."
+	@./scripts/smoke-test.sh
+
+start-and-smoke:
+	@echo "Starting stack and running smoke tests..."
+	@./scripts/startup.sh
+	@./scripts/smoke-test.sh

@@ -1,0 +1,68 @@
+time="2026-02-26T05:26:38-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+my-ordering-app-1  | [1G[0K\[1G[0K
+my-ordering-app-1  | > my-ordering-app@0.1.0 start
+my-ordering-app-1  | > react-scripts start
+my-ordering-app-1  | 
+my-ordering-app-1  | [1G[0K\[1G[0K[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+my-ordering-app-1  | (node:25) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+my-ordering-app-1  | (Use `node --trace-deprecation ...` to show where the warning was created)
+my-ordering-app-1  | (node:25) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+my-ordering-app-1  | [2J[3J[H[36mStarting the development server...[39m
+my-ordering-app-1  | [36m[39m
+my-ordering-app-1  | [2J[3J[H[32mCompiled successfully![39m
+my-ordering-app-1  | 
+my-ordering-app-1  | You can now view [1mmy-ordering-app[22m in the browser.
+my-ordering-app-1  | 
+my-ordering-app-1  |   [1mLocal:[22m            http://localhost:[1m3000[22m
+my-ordering-app-1  |   [1mOn Your Network:[22m  http://172.18.0.10:[1m3000[22m
+my-ordering-app-1  | 
+my-ordering-app-1  | Note that the development build is not optimized.
+my-ordering-app-1  | To create a production build, use [36mnpm run build[39m.
+my-ordering-app-1  | 
+my-ordering-app-1  | webpack compiled [1m[32msuccessfully[39m[22m
+my-ordering-app-1  | [2J[3J[HCompiling...
+my-ordering-app-1  | [2J[3J[H[32mCompiled successfully![39m
+my-ordering-app-1  | 
+my-ordering-app-1  | You can now view [1mmy-ordering-app[22m in the browser.
+my-ordering-app-1  | 
+my-ordering-app-1  |   [1mLocal:[22m            http://localhost:[1m3000[22m
+my-ordering-app-1  |   [1mOn Your Network:[22m  http://172.18.0.10:[1m3000[22m
+my-ordering-app-1  | 
+my-ordering-app-1  | Note that the development build is not optimized.
+my-ordering-app-1  | To create a production build, use [36mnpm run build[39m.
+my-ordering-app-1  | 
+my-ordering-app-1  | webpack compiled [1m[32msuccessfully[39m[22m
+my-ordering-app-1  | [2J[3J[HCompiling...
+my-ordering-app-1  | [2J[3J[H[32mCompiled successfully![39m
+my-ordering-app-1  | 
+my-ordering-app-1  | You can now view [1mmy-ordering-app[22m in the browser.
+my-ordering-app-1  | 
+my-ordering-app-1  |   [1mLocal:[22m            http://localhost:[1m3000[22m
+my-ordering-app-1  |   [1mOn Your Network:[22m  http://172.18.0.10:[1m3000[22m
+my-ordering-app-1  | 
+my-ordering-app-1  | Note that the development build is not optimized.
+my-ordering-app-1  | To create a production build, use [36mnpm run build[39m.
+my-ordering-app-1  | 
+my-ordering-app-1  | webpack compiled [1m[32msuccessfully[39m[22m
+my-ordering-app-1  | [2J[3J[HCompiling...
+my-ordering-app-1  | [2J[3J[H[32mCompiled successfully![39m
+my-ordering-app-1  | 
+my-ordering-app-1  | You can now view [1mmy-ordering-app[22m in the browser.
+my-ordering-app-1  | 
+my-ordering-app-1  |   [1mLocal:[22m            http://localhost:[1m3000[22m
+my-ordering-app-1  |   [1mOn Your Network:[22m  http://172.18.0.10:[1m3000[22m
+my-ordering-app-1  | 
+my-ordering-app-1  | Note that the development build is not optimized.
+my-ordering-app-1  | To create a production build, use [36mnpm run build[39m.
+my-ordering-app-1  | 
+my-ordering-app-1  | webpack compiled [1m[32msuccessfully[39m[22m
+my-ordering-app-1  | [1G[0K\[1G[0K[1mnpm[22m [31merror[39m [94mpath[39m /app
+my-ordering-app-1  | [1G[0K\[1G[0K[1mnpm[22m [31merror[39m command failed
+my-ordering-app-1  | [1G[0K\[1G[0K[1mnpm[22m [31merror[39m [94msignal[39m SIGTERM
+my-ordering-app-1  | [1G[0K\[1G[0K[1mnpm[22m [31merror[39m [94mcommand[39m sh -c react-scripts start
+my-ordering-app-1  | [1G[0K\[1G[0K[1mnpm[22m [96mnotice[39m
+my-ordering-app-1  | [1mnpm[22m [96mnotice[39m New [31mmajor[39m version of npm available! [31m10.8.2[39m -> [34m11.10.1[39m
+my-ordering-app-1  | [1mnpm[22m [96mnotice[39m Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.10.1[39m
+my-ordering-app-1  | [1mnpm[22m [96mnotice[39m To update run: [4mnpm install -g npm@11.10.1[24m
+my-ordering-app-1  | [1mnpm[22m [96mnotice[39m
+my-ordering-app-1  | [1G[0K\[1G[0K[1mnpm[22m [31merror[39m A complete log of this run can be found in: /root/.npm/_logs/2026-02-25T17_52_39_946Z-debug-0.log

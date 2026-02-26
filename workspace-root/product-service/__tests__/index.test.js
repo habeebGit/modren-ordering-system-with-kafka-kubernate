@@ -1,5 +1,8 @@
 const { test, expect } = require('@jest/globals');
+const app = require('../../../product-service/index');
 
-test('hello world!', () => {
-	expect(1 + 1).toBe(2);
+describe('product-service basic tests', () => {
+	test('health endpoint exists', () => {
+		expect(app).toBeDefined();
+	});
 });

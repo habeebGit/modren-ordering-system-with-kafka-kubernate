@@ -25,7 +25,8 @@
     "express": "^5.1.0",
     "kafkajs": "^2.2.4",
     "pg": "^8.16.3",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "jest": "^30.2.0",
