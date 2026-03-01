@@ -5,8 +5,14 @@ WORKDIR /app
 # Install curl for health checks
 RUN apk add --no-cache curl
 
-# Copy package files
+# Copy package files (install layer will be invalidated if package.json changes)
 COPY package*.json ./
+
+# copy repo-level sequelize config + migrations into the build context so they end up in the image
+# this ensures migrations/config are present at /app for runtime migrations
+# (changed to paths relative to the build context)
+COPY migrations /app/migrations
+COPY sequelize-config.js /app/sequelize-config.js
 
 # Install global and production dependencies in one layer
 RUN npm install -g sequelize-cli && \

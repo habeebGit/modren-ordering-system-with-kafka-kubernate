@@ -1,16 +1,39 @@
 version: '3.8'
 services:
-  # Kafka setup (zookeeper is a dependency)
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.1
-    platform: linux/amd64
+  # PostgreSQL databases for each microservice
+  orders_db:
+    image: postgres:15
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orders_db
+    volumes:
+      - orders_data:/var/lib/postgresql/data
     networks:
       - ordering-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d orders_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+  products_db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: products_db
+    volumes:
+      - products_data:/var/lib/postgresql/data
+    networks:
+      - ordering-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d products_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+  # Kafka setup (zookeeper is a dependency)
   kafka:
     build:
       context: .
@@ -43,48 +66,21 @@ services:
       timeout: 10s
       retries: 8
       start_period: 20s
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    platform: linux/amd64
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - ordering-net
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper
 
-  # PostgreSQL databases for each microservice
-  orders_db:
-    image: postgres:14
-    environment:
-      POSTGRES_DB: orders_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
-    ports:
-      - "5433:5432"  # Changed port to avoid conflicts
-    volumes:
-      - orders_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
-    networks:
-      - ordering-net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d orders_db"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-  products_db:
-    image: postgres:14
-    environment:
-      POSTGRES_DB: products_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
-    ports:
-      - "5434:5432"  # Different port for products DB
-    volumes:
-      - products_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
-    networks:
-      - ordering-net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d products_db"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
   # Node.js Order Service container
   order-service:
     build: ./order-service
@@ -115,7 +111,9 @@ services:
       start_period: 20s
   # Node.js Product Service container
   product-service:
-    build: ./product-service
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
     depends_on:
       products_db:
         condition: service_healthy
@@ -176,11 +174,12 @@ services:
     networks:
       - ordering-net
 
+# named volumes to persist DB/Kafka/Zookeeper data across restarts
 volumes:
   orders_data:
   products_data:
-  prometheus_data:
-  grafana_data:
+  kafka_data:
+  zookeeper_data:
 
 networks:
   ordering-net:
