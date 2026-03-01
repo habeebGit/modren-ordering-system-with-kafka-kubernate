@@ -1,0 +1,38 @@
+Running migrations for product-service...
+
+Sequelize CLI [Node: 18.20.8, CLI: 6.6.5, ORM: 6.37.7]
+
+Loaded configuration file "sequelize-config.js".
+Using environment "production".
+== 20260226-add-stock-reservations: migrating =======
+== 20260226-add-stock-reservations: migrated (0.014s)
+
+== 20260226-alter-products-add-columns: migrating =======
+== 20260226-alter-products-add-columns: migrated (0.003s)
+
+== 20260226-create-orders: migrating =======
+== 20260226-create-orders: migrated (0.013s)
+
+== 20260226-create-products: migrating =======
+== 20260226-create-products: migrated (0.002s)
+
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.11.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.11.0
+npm notice To update run: npm install -g npm@11.11.0
+npm notice
+
+> product-service@1.0.0 start
+> node index.js
+
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+{"level":"WARN","timestamp":"2026-03-01T14:34:47.090Z","logger":"kafkajs","message":"KafkaJS v2.0.0 switched default partitioner. To retain the same partitioning behavior as in previous versions, create the producer with the option \"createPartitioner: Partitioners.LegacyPartitioner\". See the migration guide at https://kafka.js.org/docs/migration-guide-v2.0.0#producer-new-default-partitioner for details. Silence this warning by setting the environment variable \"KAFKAJS_NO_PARTITIONER_WARNING=1\""}
+Product service listening at http://localhost:3002
+Creating new Kafka consumer instance (attempt 1)
+Kafka producer connected for product-service (attempt 1)
+Kafka consumer connected (attempt 1)
+{"level":"INFO","timestamp":"2026-03-01T14:34:47.128Z","logger":"kafkajs","message":"[Consumer] Starting","groupId":"product-group"}
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+{"level":"INFO","timestamp":"2026-03-01T14:35:15.111Z","logger":"kafkajs","message":"[ConsumerGroup] Consumer has joined the group","groupId":"product-group","memberId":"kafkajs-f09ae406-5957-47fa-be03-5cca823daac2","leaderId":"kafkajs-f09ae406-5957-47fa-be03-5cca823daac2","isLeader":true,"memberAssignment":{"order-events":[0]},"groupProtocol":"RoundRobinAssigner","duration":27983}
+Kafka consumer started successfully

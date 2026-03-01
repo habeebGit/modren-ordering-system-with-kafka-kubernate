@@ -1,0 +1,6 @@
+time="2026-03-01T08:52:29-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+orders_db-1  | 
+orders_db-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+orders_db-1  | 
+orders_db-1  | 2026-03-01 14:49:09.230 UTC [1] FATAL:  database files are incompatible with server
+orders_db-1  | 2026-03-01 14:49:09.230 UTC [1] DETAIL:  The data directory was initialized by PostgreSQL version 14, which is not compatible with this version 15.15 (Debian 15.15-1.pgdg13+1).

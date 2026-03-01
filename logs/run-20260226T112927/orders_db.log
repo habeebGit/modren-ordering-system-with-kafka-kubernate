@@ -1,0 +1,19 @@
+time="2026-02-26T11:29:28-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+orders_db-1  | 
+orders_db-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+orders_db-1  | 
+orders_db-1  | 2026-02-26 16:40:02.801 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+orders_db-1  | 2026-02-26 16:40:02.801 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+orders_db-1  | 2026-02-26 16:40:02.801 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+orders_db-1  | 2026-02-26 16:40:02.814 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+orders_db-1  | 2026-02-26 16:40:02.824 UTC [27] LOG:  database system was shut down at 2026-02-26 16:39:53 UTC
+orders_db-1  | 2026-02-26 16:40:02.835 UTC [1] LOG:  database system is ready to accept connections
+orders_db-1  | 2026-02-26 17:25:32.453 UTC [1] LOG:  received fast shutdown request
+orders_db-1  | 2026-02-26 17:25:32.457 UTC [1] LOG:  aborting any active transactions
+orders_db-1  | 2026-02-26 17:25:32.485 UTC [117] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 17:25:32.503 UTC [1] LOG:  background worker "logical replication launcher" (PID 33) exited with exit code 1
+orders_db-1  | 2026-02-26 17:25:32.511 UTC [579] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 17:25:32.514 UTC [343] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 17:25:32.518 UTC [725] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 17:25:32.549 UTC [28] LOG:  shutting down
+orders_db-1  | 2026-02-26 17:25:32.630 UTC [1] LOG:  database system is shut down

@@ -1,0 +1,3 @@
+# ensure migrations are copied into image
+!migrations
+!sequelize-config.js

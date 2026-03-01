@@ -1,0 +1,252 @@
+Running migrations for order-service...
+
+Sequelize CLI [Node: 18.20.8, CLI: 6.6.5, ORM: 6.37.7]
+
+Loaded configuration file "sequelize-config.js".
+Using environment "production".
+== 20260226-add-stock-reservations: migrating =======
+== 20260226-add-stock-reservations: migrated (0.014s)
+
+== 20260226-alter-products-add-columns: migrating =======
+== 20260226-alter-products-add-columns: migrated (0.006s)
+
+== 20260226-create-orders: migrating =======
+== 20260226-create-orders: migrated (0.017s)
+
+== 20260226-create-products: migrating =======
+== 20260226-create-products: migrated (0.003s)
+
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.11.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.11.0
+npm notice To update run: npm install -g npm@11.11.0
+npm notice
+[dotenv@17.3.1] injecting env (8) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+{"level":"WARN","timestamp":"2026-03-01T14:27:47.510Z","logger":"kafkajs","message":"KafkaJS v2.0.0 switched default partitioner. To retain the same partitioning behavior as in previous versions, create the producer with the option \"createPartitioner: Partitioners.LegacyPartitioner\". See the migration guide at https://kafka.js.org/docs/migration-guide-v2.0.0#producer-new-default-partitioner for details. Silence this warning by setting the environment variable \"KAFKAJS_NO_PARTITIONER_WARNING=1\""}
+Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'Orders'
+Executing (default): SELECT pk.constraint_type as "Constraint",c.column_name as "Field", c.column_default as "Default",c.is_nullable as "Null", (CASE WHEN c.udt_name = 'hstore' THEN c.udt_name ELSE c.data_type END) || (CASE WHEN c.character_maximum_length IS NOT NULL THEN '(' || c.character_maximum_length || ')' ELSE '' END) as "Type", (SELECT array_agg(e.enumlabel) FROM pg_catalog.pg_type t JOIN pg_catalog.pg_enum e ON t.oid=e.enumtypid WHERE t.typname=c.udt_name) AS "special", (SELECT pgd.description FROM pg_catalog.pg_statio_all_tables AS st INNER JOIN pg_catalog.pg_description pgd on (pgd.objoid=st.relid) WHERE c.ordinal_position=pgd.objsubid AND c.table_name=st.relname) AS "Comment" FROM information_schema.columns c LEFT JOIN (SELECT tc.table_schema, tc.table_name, cu.column_name, tc.constraint_type FROM information_schema.TABLE_CONSTRAINTS tc JOIN information_schema.KEY_COLUMN_USAGE  cu ON tc.table_schema=cu.table_schema and tc.table_name=cu.table_name and tc.constraint_name=cu.constraint_name and tc.constraint_type='PRIMARY KEY') pk ON pk.table_schema=c.table_schema AND pk.table_name=c.table_name AND pk.column_name=c.column_name WHERE c.table_name = 'Orders' AND c.table_schema = 'public'
+Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'Orders' AND tc.table_catalog = 'orders_db'
+Executing (default): ALTER TABLE "Orders" ALTER COLUMN "userId" SET NOT NULL;ALTER TABLE "Orders" ALTER COLUMN "userId" DROP DEFAULT;ALTER TABLE "Orders" ALTER COLUMN "userId" TYPE INTEGER;
+Executing (default): ALTER TABLE "Orders" ALTER COLUMN "status" DROP NOT NULL;ALTER TABLE "Orders" ALTER COLUMN "status" SET DEFAULT 'Pending';ALTER TABLE "Orders" ALTER COLUMN "status" TYPE VARCHAR(255);
+Executing (default): ALTER TABLE "Orders" ALTER COLUMN "createdAt" SET NOT NULL;ALTER TABLE "Orders" ALTER COLUMN "createdAt" DROP DEFAULT;ALTER TABLE "Orders" ALTER COLUMN "createdAt" TYPE TIMESTAMP WITH TIME ZONE;
+Executing (default): ALTER TABLE "Orders" ALTER COLUMN "updatedAt" SET NOT NULL;ALTER TABLE "Orders" ALTER COLUMN "updatedAt" DROP DEFAULT;ALTER TABLE "Orders" ALTER COLUMN "updatedAt" TYPE TIMESTAMP WITH TIME ZONE;
+Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'Orders' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'OrderItems'
+Executing (default): SELECT pk.constraint_type as "Constraint",c.column_name as "Field", c.column_default as "Default",c.is_nullable as "Null", (CASE WHEN c.udt_name = 'hstore' THEN c.udt_name ELSE c.data_type END) || (CASE WHEN c.character_maximum_length IS NOT NULL THEN '(' || c.character_maximum_length || ')' ELSE '' END) as "Type", (SELECT array_agg(e.enumlabel) FROM pg_catalog.pg_type t JOIN pg_catalog.pg_enum e ON t.oid=e.enumtypid WHERE t.typname=c.udt_name) AS "special", (SELECT pgd.description FROM pg_catalog.pg_statio_all_tables AS st INNER JOIN pg_catalog.pg_description pgd on (pgd.objoid=st.relid) WHERE c.ordinal_position=pgd.objsubid AND c.table_name=st.relname) AS "Comment" FROM information_schema.columns c LEFT JOIN (SELECT tc.table_schema, tc.table_name, cu.column_name, tc.constraint_type FROM information_schema.TABLE_CONSTRAINTS tc JOIN information_schema.KEY_COLUMN_USAGE  cu ON tc.table_schema=cu.table_schema and tc.table_name=cu.table_name and tc.constraint_name=cu.constraint_name and tc.constraint_type='PRIMARY KEY') pk ON pk.table_schema=c.table_schema AND pk.table_name=c.table_name AND pk.column_name=c.column_name WHERE c.table_name = 'OrderItems' AND c.table_schema = 'public'
+Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'OrderItems' AND tc.table_catalog = 'orders_db'
+Executing (default): ALTER TABLE "OrderItems" DROP CONSTRAINT "OrderItems_OrderId_fkey"
+Executing (default): ALTER TABLE "OrderItems"  ADD FOREIGN KEY ("OrderId") REFERENCES "Orders" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+Executing (default): ALTER TABLE "OrderItems" ALTER COLUMN "productId" SET NOT NULL;ALTER TABLE "OrderItems" ALTER COLUMN "productId" DROP DEFAULT;ALTER TABLE "OrderItems" ALTER COLUMN "productId" TYPE INTEGER;
+Executing (default): ALTER TABLE "OrderItems" ALTER COLUMN "quantity" SET NOT NULL;ALTER TABLE "OrderItems" ALTER COLUMN "quantity" DROP DEFAULT;ALTER TABLE "OrderItems" ALTER COLUMN "quantity" TYPE INTEGER;
+Executing (default): ALTER TABLE "OrderItems" ALTER COLUMN "createdAt" SET NOT NULL;ALTER TABLE "OrderItems" ALTER COLUMN "createdAt" DROP DEFAULT;ALTER TABLE "OrderItems" ALTER COLUMN "createdAt" TYPE TIMESTAMP WITH TIME ZONE;
+Executing (default): ALTER TABLE "OrderItems" ALTER COLUMN "updatedAt" SET NOT NULL;ALTER TABLE "OrderItems" ALTER COLUMN "updatedAt" DROP DEFAULT;ALTER TABLE "OrderItems" ALTER COLUMN "updatedAt" TYPE TIMESTAMP WITH TIME ZONE;
+Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'OrderItems' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'ProcessedEvents'
+Executing (default): SELECT pk.constraint_type as "Constraint",c.column_name as "Field", c.column_default as "Default",c.is_nullable as "Null", (CASE WHEN c.udt_name = 'hstore' THEN c.udt_name ELSE c.data_type END) || (CASE WHEN c.character_maximum_length IS NOT NULL THEN '(' || c.character_maximum_length || ')' ELSE '' END) as "Type", (SELECT array_agg(e.enumlabel) FROM pg_catalog.pg_type t JOIN pg_catalog.pg_enum e ON t.oid=e.enumtypid WHERE t.typname=c.udt_name) AS "special", (SELECT pgd.description FROM pg_catalog.pg_statio_all_tables AS st INNER JOIN pg_catalog.pg_description pgd on (pgd.objoid=st.relid) WHERE c.ordinal_position=pgd.objsubid AND c.table_name=st.relname) AS "Comment" FROM information_schema.columns c LEFT JOIN (SELECT tc.table_schema, tc.table_name, cu.column_name, tc.constraint_type FROM information_schema.TABLE_CONSTRAINTS tc JOIN information_schema.KEY_COLUMN_USAGE  cu ON tc.table_schema=cu.table_schema and tc.table_name=cu.table_name and tc.constraint_name=cu.constraint_name and tc.constraint_type='PRIMARY KEY') pk ON pk.table_schema=c.table_schema AND pk.table_name=c.table_name AND pk.column_name=c.column_name WHERE c.table_name = 'ProcessedEvents' AND c.table_schema = 'public'
+Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'ProcessedEvents' AND tc.table_catalog = 'orders_db'
+Executing (default): ALTER TABLE "public"."ProcessedEvents" ADD COLUMN "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL;
+Executing (default): ALTER TABLE "public"."ProcessedEvents" ADD COLUMN "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL;
+Executing (default): ALTER TABLE "ProcessedEvents" ALTER COLUMN "eventType" SET NOT NULL;ALTER TABLE "ProcessedEvents" ALTER COLUMN "eventType" DROP DEFAULT;ALTER TABLE "ProcessedEvents" ALTER COLUMN "eventType" TYPE VARCHAR(255);
+Executing (default): ALTER TABLE "ProcessedEvents" ALTER COLUMN "processedAt" SET NOT NULL;ALTER TABLE "ProcessedEvents" ALTER COLUMN "processedAt" DROP DEFAULT;ALTER TABLE "ProcessedEvents" ALTER COLUMN "processedAt" TYPE TIMESTAMP WITH TIME ZONE;
+Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'ProcessedEvents' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'DeadLetterEvents'
+Executing (default): SELECT pk.constraint_type as "Constraint",c.column_name as "Field", c.column_default as "Default",c.is_nullable as "Null", (CASE WHEN c.udt_name = 'hstore' THEN c.udt_name ELSE c.data_type END) || (CASE WHEN c.character_maximum_length IS NOT NULL THEN '(' || c.character_maximum_length || ')' ELSE '' END) as "Type", (SELECT array_agg(e.enumlabel) FROM pg_catalog.pg_type t JOIN pg_catalog.pg_enum e ON t.oid=e.enumtypid WHERE t.typname=c.udt_name) AS "special", (SELECT pgd.description FROM pg_catalog.pg_statio_all_tables AS st INNER JOIN pg_catalog.pg_description pgd on (pgd.objoid=st.relid) WHERE c.ordinal_position=pgd.objsubid AND c.table_name=st.relname) AS "Comment" FROM information_schema.columns c LEFT JOIN (SELECT tc.table_schema, tc.table_name, cu.column_name, tc.constraint_type FROM information_schema.TABLE_CONSTRAINTS tc JOIN information_schema.KEY_COLUMN_USAGE  cu ON tc.table_schema=cu.table_schema and tc.table_name=cu.table_name and tc.constraint_name=cu.constraint_name and tc.constraint_type='PRIMARY KEY') pk ON pk.table_schema=c.table_schema AND pk.table_name=c.table_name AND pk.column_name=c.column_name WHERE c.table_name = 'DeadLetterEvents' AND c.table_schema = 'public'
+Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'DeadLetterEvents' AND tc.table_catalog = 'orders_db'
+Executing (default): ALTER TABLE "public"."DeadLetterEvents" ADD COLUMN "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL;
+Executing (default): ALTER TABLE "DeadLetterEvents" ALTER COLUMN "eventType" DROP NOT NULL;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "eventType" DROP DEFAULT;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "eventType" TYPE VARCHAR(255);
+Executing (default): ALTER TABLE "DeadLetterEvents" ALTER COLUMN "payload" DROP NOT NULL;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "payload" DROP DEFAULT;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "payload" TYPE JSON;
+Executing (default): ALTER TABLE "DeadLetterEvents" ALTER COLUMN "errorMessage" DROP NOT NULL;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "errorMessage" DROP DEFAULT;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "errorMessage" TYPE TEXT;
+Executing (default): ALTER TABLE "DeadLetterEvents" ALTER COLUMN "createdAt" DROP NOT NULL;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "createdAt" DROP DEFAULT;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "createdAt" TYPE TIMESTAMP WITH TIME ZONE;
+Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'DeadLetterEvents' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+{"level":"info","message":"Kafka producer connected","timestamp":"2026-03-01T14:27:47.610Z"}
+Server is running on port 3001
+{"level":"ERROR","timestamp":"2026-03-01T14:27:47.729Z","logger":"kafkajs","message":"[Connection] Response Metadata(key: 3, version: 6)","broker":"kafka:9092","clientId":"kafkajs","error":"There is no leader for this topic-partition as we are in the middle of a leadership election","correlationId":1,"size":82}
+{"level":"ERROR","timestamp":"2026-03-01T14:27:48.000Z","logger":"kafkajs","message":"[Connection] Response Metadata(key: 3, version: 6)","broker":"kafka:9092","clientId":"kafkajs","error":"There is no leader for this topic-partition as we are in the middle of a leadership election","correlationId":2,"size":82}
+{"level":"INFO","timestamp":"2026-03-01T14:27:48.628Z","logger":"kafkajs","message":"[Consumer] Starting","groupId":"order-service-group"}
+{"level":"ERROR","timestamp":"2026-03-01T14:27:48.642Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":4,"size":55}
+{"level":"ERROR","timestamp":"2026-03-01T14:27:48.976Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":5,"size":55}
+{"level":"INFO","timestamp":"2026-03-01T14:27:49.889Z","logger":"kafkajs","message":"[ConsumerGroup] Consumer has joined the group","groupId":"order-service-group","memberId":"kafkajs-c47e3a52-907e-44fc-ada6-c5022c9ca8e0","leaderId":"kafkajs-c47e3a52-907e-44fc-ada6-c5022c9ca8e0","isLeader":true,"memberAssignment":{"order-events":[0]},"groupProtocol":"RoundRobinAssigner","duration":1260}
+{"level":"info","message":"Kafka consumer started","timestamp":"2026-03-01T14:27:49.890Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:27:51.165Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:27:51 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:27:51.168Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:27:54 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:27:54.452Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:28:01.260Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:28:01 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:28:01.261Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:28:09 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:28:09.487Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:28:11.377Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:28:11 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:28:11.378Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:28:21.474Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:28:21 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:28:21.475Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:28:24 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:28:24.460Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:28:31.558Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:28:31 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:28:31.559Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:28:39 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:28:39.443Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:28:41.638Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:28:41 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:28:41.639Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:28:51.720Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:28:51 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:28:51.722Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:28:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:28:57.106Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:29:04.469Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:29:04 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:29:04.470Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:29:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:29:12.107Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:29:14.543Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:29:14 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:29:14.544Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:29:24.688Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:29:24 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:29:24.690Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:29:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:29:27.116Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:29:34.764Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:29:34 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:29:34.765Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:29:42 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:29:42.106Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:29:44.851Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:29:44 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:29:44.852Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:29:54.955Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:29:54 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:29:54.956Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:29:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:29:57.118Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:30:05.059Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:30:05 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:30:05.060Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:30:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:30:12.106Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:30:15.135Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:30:15 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:30:15.136Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:30:25.223Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:30:25 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:30:25.224Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:30:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:30:27.105Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:30:35.364Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:30:35 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:30:35.365Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:30:42 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:30:42.113Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:30:45.498Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:30:45 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:30:45.499Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:30:55.600Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:30:55 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:30:55.601Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:30:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:30:57.110Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:31:05.676Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:31:05 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:31:05.677Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:31:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:31:12.112Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:31:15.756Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:31:15 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:31:15.757Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:31:25.972Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:31:25 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:31:25.974Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:31:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:31:27.106Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:31:36.125Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:31:36 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:31:36.127Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:31:42 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:31:42.107Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:31:46.225Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:31:46 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:31:46.226Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:31:56.310Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:31:56 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:31:56.313Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:31:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:31:57.104Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:32:06.452Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:32:06 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:32:06.455Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:32:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:32:12.110Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:32:16.542Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:32:16 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:32:16.543Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:32:26.621Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:32:26 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:32:26.622Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:32:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:32:27.106Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:32:36.798Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:32:36 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:32:36.800Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:32:42 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:32:42.108Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:32:46.873Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:32:46 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:32:46.874Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:32:56.969Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:32:56 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:32:56.969Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:32:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:32:57.101Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:33:07.106Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:33:07 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:33:07.108Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:33:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:33:12.115Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:33:17.185Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:33:17 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:33:17.185Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:33:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:33:27.112Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:33:27.310Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:33:27 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:33:27.311Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:33:37.416Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:33:37 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:33:37.418Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:33:42 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:33:42.106Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:33:47.500Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:33:47 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:33:47.500Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:33:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:33:57.104Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:33:57.582Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:33:57 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:33:57.582Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:34:07.706Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:34:07 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:34:07.710Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:34:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:34:12.113Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:34:17.814Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:34:17 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:34:17.816Z"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:26.020Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:26.021Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":0,"retryTime":252}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:26.274Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:26.275Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":1,"retryTime":586}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:26.863Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:26.863Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":2,"retryTime":1226}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:34:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:34:27.115Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:34:28.106Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:34:28 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:34:28.110Z"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:28.118Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:28.121Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":3,"retryTime":2298}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:30.425Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:30.426Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":4,"retryTime":4948}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:35.381Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:35.382Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":5,"retryTime":7940}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:35.385Z","logger":"kafkajs","message":"[Consumer] Crash: KafkaJSNonRetriableError: Connection error: connect ECONNREFUSED 172.18.0.7:9092","groupId":"order-service-group","stack":"KafkaJSNonRetriableError: Connection error: connect ECONNREFUSED 172.18.0.7:9092\n    at /app/order-service/node_modules/kafkajs/src/retry/index.js:55:18\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:35.391Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"INFO","timestamp":"2026-03-01T14:34:35.391Z","logger":"kafkajs","message":"[Consumer] Stopped","groupId":"order-service-group"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:35.391Z","logger":"kafkajs","message":"[Consumer] Restarting the consumer in 300ms","retryTime":300,"groupId":"order-service-group"}
+{"level":"INFO","timestamp":"2026-03-01T14:34:35.693Z","logger":"kafkajs","message":"[Consumer] Starting","groupId":"order-service-group"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:35.695Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:35.695Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":0,"retryTime":311}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:36.010Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:36.011Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":1,"retryTime":732}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:36.745Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:36.745Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":2,"retryTime":1494}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:34:38.211Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:34:38 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:34:38.212Z"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:38.243Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:38.243Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":3,"retryTime":3082}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:41.327Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+{"level":"ERROR","timestamp":"2026-03-01T14:34:41.327Z","logger":"kafkajs","message":"[BrokerPool] Failed to connect to seed broker, trying another broker from the list: Connection error: connect ECONNREFUSED 172.18.0.7:9092","retryCount":4,"retryTime":5934}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:34:42 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:34:42.102Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:34:48.345Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:34:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:34:48.346Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:34:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:34:57.098Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:34:58.465Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:34:58 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:34:58.469Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:35:08.590Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:35:08 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:35:08.600Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:35:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:35:12.101Z"}
+{"level":"INFO","timestamp":"2026-03-01T14:35:15.059Z","logger":"kafkajs","message":"[ConsumerGroup] Consumer has joined the group","groupId":"order-service-group","memberId":"kafkajs-2a2ca141-9fa2-41be-bf6e-e7ac8fe2c01c","leaderId":"kafkajs-2a2ca141-9fa2-41be-bf6e-e7ac8fe2c01c","isLeader":true,"memberAssignment":{"order-events":[0]},"groupProtocol":"RoundRobinAssigner","duration":27775}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:35:18.705Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:35:18 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:35:18.707Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:35:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:35:27.112Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:35:28.802Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:35:28 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:35:28.802Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:35:38.884Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:35:38 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:35:38.885Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:35:42 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:35:42.106Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:35:48.967Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:35:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:35:48.968Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:35:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:35:57.115Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:35:59.047Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:35:59 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:35:59.047Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:36:09.217Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:36:09 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:36:09.220Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:36:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:36:12.112Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:36:19.314Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:36:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:36:19.315Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:36:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:36:27.105Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:36:29.390Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:36:29 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:36:29.391Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:36:39.489Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:36:39 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:36:39.490Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:36:42 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:36:42.101Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:36:49.595Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:36:49 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:36:49.596Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:36:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:36:57.110Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:36:59.670Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:36:59 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:36:59.670Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:37:09.757Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:37:09 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:37:09.758Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:37:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:37:12.102Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:37:19.841Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:37:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:37:19.842Z"}
+{"level":"info","message":"::ffff:172.18.0.6 - - [01/Mar/2026:14:37:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T14:37:27.115Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T14:37:29.938Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:14:37:29 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T14:37:29.939Z"}

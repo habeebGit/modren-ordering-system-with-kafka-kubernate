@@ -1,0 +1,73 @@
+time="2026-02-28T07:34:18-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+orders_db-1  | 
+orders_db-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+orders_db-1  | 
+orders_db-1  | 2026-02-26 17:33:13.593 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+orders_db-1  | 2026-02-26 17:33:13.593 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+orders_db-1  | 2026-02-26 17:33:13.593 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+orders_db-1  | 2026-02-26 17:33:13.595 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+orders_db-1  | 2026-02-26 17:33:13.599 UTC [27] LOG:  database system was shut down at 2026-02-26 17:33:05 UTC
+orders_db-1  | 2026-02-26 17:33:13.609 UTC [1] LOG:  database system is ready to accept connections
+orders_db-1  | 2026-02-26 17:37:09.433 UTC [54] LOG:  unexpected EOF on client connection with an open transaction
+orders_db-1  | 2026-02-26 17:45:16.974 UTC [199] LOG:  unexpected EOF on client connection with an open transaction
+orders_db-1  | 2026-02-26 17:45:16.974 UTC [147] LOG:  unexpected EOF on client connection with an open transaction
+orders_db-1  | 2026-02-26 17:45:16.974 UTC [300] LOG:  unexpected EOF on client connection with an open transaction
+orders_db-1  | 2026-02-26 18:40:16.701 UTC [1] LOG:  received fast shutdown request
+orders_db-1  | 2026-02-26 18:40:16.707 UTC [1] LOG:  aborting any active transactions
+orders_db-1  | 2026-02-26 18:40:16.707 UTC [941] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 18:40:16.707 UTC [285] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 18:40:16.707 UTC [916] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 18:40:16.707 UTC [365] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 18:40:16.708 UTC [340] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 18:40:16.712 UTC [106] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 18:40:16.714 UTC [172] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-26 18:40:16.715 UTC [1] LOG:  background worker "logical replication launcher" (PID 33) exited with exit code 1
+orders_db-1  | 2026-02-26 18:40:16.718 UTC [28] LOG:  shutting down
+orders_db-1  | 2026-02-26 18:40:16.731 UTC [1] LOG:  database system is shut down
+orders_db-1  | 
+orders_db-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+orders_db-1  | 
+orders_db-1  | 2026-02-26 20:15:58.263 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+orders_db-1  | 2026-02-26 20:15:58.265 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+orders_db-1  | 2026-02-26 20:15:58.265 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+orders_db-1  | 2026-02-26 20:15:58.276 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+orders_db-1  | 2026-02-26 20:15:58.288 UTC [27] LOG:  database system was shut down at 2026-02-26 18:40:16 UTC
+orders_db-1  | 2026-02-26 20:15:58.333 UTC [1] LOG:  database system is ready to accept connections
+orders_db-1  | 2026-02-26 20:24:39.007 UTC [235] ERROR:  relation "SequelizeMeta" does not exist at character 15
+orders_db-1  | 2026-02-26 20:24:39.007 UTC [235] STATEMENT:  SELECT * FROM "SequelizeMeta" ORDER BY 1;
+orders_db-1  | 2026-02-26 20:26:33.026 UTC [270] ERROR:  unterminated quoted string at or near "'
+orders_db-1  | 	" at character 72
+orders_db-1  | 2026-02-26 20:26:33.026 UTC [270] STATEMENT:  
+orders_db-1  | 	CREATE TABLE IF NOT EXISTS stock_reservations (
+orders_db-1  | 	id SERIAL PRIMARY KEY
+orders_db-1  | 	'
+orders_db-1  | 	
+orders_db-1  | 2026-02-27 01:40:16.015 UTC [1] LOG:  received fast shutdown request
+orders_db-1  | 2026-02-27 01:40:16.039 UTC [1] LOG:  aborting any active transactions
+orders_db-1  | 2026-02-27 01:40:16.044 UTC [473] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-27 01:40:16.046 UTC [313] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-27 01:40:16.051 UTC [293] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-27 01:40:16.055 UTC [174] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-27 01:40:16.055 UTC [207] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-27 01:40:16.069 UTC [1] LOG:  background worker "logical replication launcher" (PID 33) exited with exit code 1
+orders_db-1  | 2026-02-27 01:40:16.080 UTC [28] LOG:  shutting down
+orders_db-1  | 2026-02-27 01:40:16.168 UTC [1] LOG:  database system is shut down
+orders_db-1  | 
+orders_db-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+orders_db-1  | 
+orders_db-1  | 2026-02-27 08:33:07.823 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+orders_db-1  | 2026-02-27 08:33:07.824 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+orders_db-1  | 2026-02-27 08:33:07.824 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+orders_db-1  | 2026-02-27 08:33:07.827 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+orders_db-1  | 2026-02-27 08:33:07.834 UTC [27] LOG:  database system was shut down at 2026-02-27 01:40:16 UTC
+orders_db-1  | 2026-02-27 08:33:07.854 UTC [1] LOG:  database system is ready to accept connections
+orders_db-1  | 2026-02-27 08:40:43.098 UTC [64] LOG:  unexpected EOF on client connection with an open transaction
+orders_db-1  | 2026-02-27 08:54:37.436 UTC [259] LOG:  unexpected EOF on client connection with an open transaction
+orders_db-1  | 2026-02-27 08:54:37.437 UTC [248] LOG:  unexpected EOF on client connection with an open transaction
+orders_db-1  | 2026-02-28 07:29:27.072 UTC [1] LOG:  received fast shutdown request
+orders_db-1  | 2026-02-28 07:29:27.100 UTC [1] LOG:  aborting any active transactions
+orders_db-1  | 2026-02-28 07:29:27.156 UTC [450] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-28 07:29:27.167 UTC [236] FATAL:  terminating connection due to administrator command
+orders_db-1  | 2026-02-28 07:29:27.279 UTC [1] LOG:  background worker "logical replication launcher" (PID 33) exited with exit code 1
+orders_db-1  | 2026-02-28 07:29:27.366 UTC [28] LOG:  shutting down
+orders_db-1  | 2026-02-28 07:29:28.109 UTC [1] LOG:  database system is shut down

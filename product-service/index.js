@@ -661,7 +661,29 @@ const startKafkaConsumer = async () => {
 // Periodic cleanup of expired reservations
 setInterval(cleanupExpiredReservations, 5 * 60 * 1000); // Every 5 minutes
 
-app.listen(port, () => {
-  console.log(`Product service listening at http://localhost:${port}`);
-});
+const server = app.listen(port, () => {
+  console.info(`Product Service running on port ${port}`)
+})
+
+// Graceful shutdown for product-service
+async function shutdown(signal) {
+  console.info('shutdown signal received', signal)
+  try {
+    server.close(() => console.info('HTTP server closed'))
+
+    // adjust variable names if your product-service uses different names
+    if (consumer) await consumer.disconnect().catch(()=>{})
+    if (producer) await producer.disconnect().catch(()=>{})
+    if (sequelize) await sequelize.close().catch(()=>{})
+
+    console.info('shutdown complete')
+    process.exit(0)
+  } catch (err) {
+    console.error('error during shutdown', err)
+    process.exit(1)
+  }
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'))
+process.on('SIGTERM', () => shutdown('SIGTERM'))
 

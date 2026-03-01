@@ -1,0 +1,135 @@
+time="2026-03-01T08:24:48-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+product-service-1  | Running migrations for product-service...
+product-service-1  | 
+product-service-1  | Sequelize CLI [Node: 18.20.8, CLI: 6.6.5, ORM: 6.37.7]
+product-service-1  | 
+product-service-1  | 
+product-service-1  | ERROR: Cannot find "/app/sequelize-config.js". Have you run "sequelize init"?
+product-service-1  | 
+product-service-1  | npm notice
+product-service-1  | npm notice New major version of npm available! 10.8.2 -> 11.11.0
+product-service-1  | npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.11.0
+product-service-1  | npm notice To update run: npm install -g npm@11.11.0
+product-service-1  | npm notice
+product-service-1  | 
+product-service-1  | > product-service@1.0.0 start
+product-service-1  | > node index.js
+product-service-1  | 
+product-service-1  | [dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+product-service-1  | {"level":"WARN","timestamp":"2026-03-01T07:33:43.006Z","logger":"kafkajs","message":"KafkaJS v2.0.0 switched default partitioner. To retain the same partitioning behavior as in previous versions, create the producer with the option \"createPartitioner: Partitioners.LegacyPartitioner\". See the migration guide at https://kafka.js.org/docs/migration-guide-v2.0.0#producer-new-default-partitioner for details. Silence this warning by setting the environment variable \"KAFKAJS_NO_PARTITIONER_WARNING=1\""}
+product-service-1  | Product service listening at http://localhost:3002
+product-service-1  | Creating new Kafka consumer instance (attempt 1)
+product-service-1  | Kafka producer connected for product-service (attempt 1)
+product-service-1  | Kafka consumer connected (attempt 1)
+product-service-1  | {"level":"ERROR","timestamp":"2026-03-01T07:33:43.078Z","logger":"kafkajs","message":"[Connection] Response Metadata(key: 3, version: 6)","broker":"kafka:9092","clientId":"kafkajs","error":"There is no leader for this topic-partition as we are in the middle of a leadership election","correlationId":1,"size":82}
+product-service-1  | {"level":"ERROR","timestamp":"2026-03-01T07:33:43.433Z","logger":"kafkajs","message":"[Connection] Response Metadata(key: 3, version: 6)","broker":"kafka:9092","clientId":"kafkajs","error":"There is no leader for this topic-partition as we are in the middle of a leadership election","correlationId":2,"size":82}
+product-service-1  | {"level":"INFO","timestamp":"2026-03-01T07:33:44.027Z","logger":"kafkajs","message":"[Consumer] Starting","groupId":"product-group"}
+product-service-1  | {"level":"ERROR","timestamp":"2026-03-01T07:33:44.065Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":4,"size":55}
+product-service-1  | {"level":"ERROR","timestamp":"2026-03-01T07:33:44.338Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":5,"size":55}
+product-service-1  | {"level":"INFO","timestamp":"2026-03-01T07:33:45.110Z","logger":"kafkajs","message":"[ConsumerGroup] Consumer has joined the group","groupId":"product-group","memberId":"kafkajs-7b07c15e-9c86-4b84-acbc-dacbf6267ed4","leaderId":"kafkajs-7b07c15e-9c86-4b84-acbc-dacbf6267ed4","isLeader":true,"memberAssignment":{"order-events":[0]},"groupProtocol":"RoundRobinAssigner","duration":1082}
+product-service-1  | Kafka consumer started successfully
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Error fetching products: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async Product.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async /app/index.js:300:22
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Error fetching products: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async Product.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async /app/index.js:300:22
+product-service-1  | Executing (default): INSERT INTO "products" ("id","name","price","stock","reserved_stock","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","name","price","stock","reserved_stock","created_at","updated_at";
+product-service-1  | Error creating product: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.insert (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:308:21)
+product-service-1  |     at async model.save (/app/node_modules/sequelize/lib/model.js:2490:35)
+product-service-1  |     at async Product.create (/app/node_modules/sequelize/lib/model.js:1362:12)
+product-service-1  |     at async /app/index.js:344:21
+product-service-1  | Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 07:38:43.011 +00:00';
+product-service-1  | Error during cleanup of expired reservations: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 07:38:43.011 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 07:38:43.011 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 07:38:43.011 +00:00';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | {"level":"WARN","timestamp":"2026-03-01T09:07:47.336Z","logger":"kafkajs","message":"[RequestQueue] Response without match","clientId":"kafkajs","broker":"kafka:9092","correlationId":77}
+product-service-1  | {"level":"WARN","timestamp":"2026-03-01T09:41:23.386Z","logger":"kafkajs","message":"[RequestQueue] Response without match","clientId":"kafkajs","broker":"kafka:9092","correlationId":89}
+product-service-1  | {"level":"WARN","timestamp":"2026-03-01T10:33:44.525Z","logger":"kafkajs","message":"[RequestQueue] Response without match","clientId":"kafkajs","broker":"kafka:9092","correlationId":95}
+product-service-1  | npm error path /app
+product-service-1  | npm error command failed
+product-service-1  | npm error signal SIGTERM
+product-service-1  | npm error command sh -c node index.js
+product-service-1  | npm error A complete log of this run can be found in: /home/nodejs/.npm/_logs/2026-03-01T07_33_42_514Z-debug-0.log

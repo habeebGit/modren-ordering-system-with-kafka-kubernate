@@ -1,0 +1,1229 @@
+time="2026-02-26T11:29:28-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+product-service-1  | Running migrations for product-service...
+product-service-1  | 
+product-service-1  | Sequelize CLI [Node: 18.20.8, CLI: 6.6.5, ORM: 6.37.7]
+product-service-1  | 
+product-service-1  | 
+product-service-1  | ERROR: Cannot find "/app/sequelize-config.js". Have you run "sequelize init"?
+product-service-1  | 
+product-service-1  | npm notice
+product-service-1  | npm notice New major version of npm available! 10.8.2 -> 11.11.0
+product-service-1  | npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.11.0
+product-service-1  | npm notice To update run: npm install -g npm@11.11.0
+product-service-1  | npm notice
+product-service-1  | 
+product-service-1  | > product-service@1.0.0 start
+product-service-1  | > node index.js
+product-service-1  | 
+product-service-1  | [dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+product-service-1  | {"level":"WARN","timestamp":"2026-02-26T16:40:18.607Z","logger":"kafkajs","message":"KafkaJS v2.0.0 switched default partitioner. To retain the same partitioning behavior as in previous versions, create the producer with the option \"createPartitioner: Partitioners.LegacyPartitioner\". See the migration guide at https://kafka.js.org/docs/migration-guide-v2.0.0#producer-new-default-partitioner for details. Silence this warning by setting the environment variable \"KAFKAJS_NO_PARTITIONER_WARNING=1\""}
+product-service-1  | Product service listening at http://localhost:3002
+product-service-1  | Creating new Kafka consumer instance (attempt 1)
+product-service-1  | Kafka producer connected for product-service (attempt 1)
+product-service-1  | Kafka consumer connected (attempt 1)
+product-service-1  | {"level":"ERROR","timestamp":"2026-02-26T16:40:18.715Z","logger":"kafkajs","message":"[Connection] Response Metadata(key: 3, version: 6)","broker":"kafka:9092","clientId":"kafkajs","error":"There is no leader for this topic-partition as we are in the middle of a leadership election","correlationId":1,"size":82}
+product-service-1  | {"level":"INFO","timestamp":"2026-02-26T16:40:19.046Z","logger":"kafkajs","message":"[Consumer] Starting","groupId":"product-group"}
+product-service-1  | {"level":"ERROR","timestamp":"2026-02-26T16:40:19.087Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":3,"size":55}
+product-service-1  | {"level":"ERROR","timestamp":"2026-02-26T16:40:19.415Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":4,"size":55}
+product-service-1  | {"level":"INFO","timestamp":"2026-02-26T16:40:20.184Z","logger":"kafkajs","message":"[ConsumerGroup] Consumer has joined the group","groupId":"product-group","memberId":"kafkajs-7afc3167-085d-4bea-bede-3f42d6128459","leaderId":"kafkajs-7afc3167-085d-4bea-bede-3f42d6128459","isLeader":true,"memberAssignment":{"order-events":[0]},"groupProtocol":"RoundRobinAssigner","duration":1138}
+product-service-1  | Kafka consumer started successfully
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (2b792b4e-e76f-427c-9ce8-40832b16ad77): START TRANSACTION;
+product-service-1  | Executing (2b792b4e-e76f-427c-9ce8-40832b16ad77): SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 4;
+product-service-1  | Executing (2b792b4e-e76f-427c-9ce8-40832b16ad77): ROLLBACK;
+product-service-1  | Stock event sent successfully { eventType: 'STOCK_RESERVATION_FAILED' }
+product-service-1  | Error reserving stock: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async StockReservation.findOne (/app/node_modules/sequelize/lib/model.js:1240:12)
+product-service-1  |     at async /app/index.js:392:37 {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '210',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 4;',
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '210',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 4;',
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 4;',
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '65f1618a-6326-4b85-8b94-fad9df5d8a92';
+product-service-1  | Error processing order event: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async ProcessedEvent.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async ProcessedEvent.findOne (/app/node_modules/sequelize/lib/model.js:1240:12)
+product-service-1  |     at async ProcessedEvent.findByPk (/app/node_modules/sequelize/lib/model.js:1221:12)
+product-service-1  |     at async Runner.eachMessage (/app/index.js:165:44)
+product-service-1  |     at async Runner.processEachMessage (/app/node_modules/kafkajs/src/consumer/runner.js:231:9)
+product-service-1  |     at async onBatch (/app/node_modules/kafkajs/src/consumer/runner.js:447:9) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "processed_events" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 116,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '138',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '65f1618a-6326-4b85-8b94-fad9df5d8a92';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "processed_events" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 116,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '138',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '65f1618a-6326-4b85-8b94-fad9df5d8a92';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '65f1618a-6326-4b85-8b94-fad9df5d8a92';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:45:18.611 +00:00';
+product-service-1  | Error during cleanup of expired reservations: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:45:18.611 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:45:18.611 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:45:18.611 +00:00';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:50:39.509 +00:00';
+product-service-1  | Error during cleanup of expired reservations: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:50:39.509 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:50:39.509 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:50:39.509 +00:00';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:55:39.510 +00:00';
+product-service-1  | Error during cleanup of expired reservations: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:55:39.510 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:55:39.510 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 16:55:39.510 +00:00';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (51179e2d-a8c6-4be4-b6cc-4a442656b6e4): START TRANSACTION;
+product-service-1  | Executing (51179e2d-a8c6-4be4-b6cc-4a442656b6e4): SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 5;
+product-service-1  | Executing (51179e2d-a8c6-4be4-b6cc-4a442656b6e4): ROLLBACK;
+product-service-1  | Stock event sent successfully { eventType: 'STOCK_RESERVATION_FAILED' }
+product-service-1  | Error reserving stock: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async StockReservation.findOne (/app/node_modules/sequelize/lib/model.js:1240:12)
+product-service-1  |     at async /app/index.js:392:37 {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '210',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 5;',
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '210',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 5;',
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 5;',
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '661555a3-ff5c-42e0-9781-c1d6b246740d';
+product-service-1  | Error processing order event: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async ProcessedEvent.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async ProcessedEvent.findOne (/app/node_modules/sequelize/lib/model.js:1240:12)
+product-service-1  |     at async ProcessedEvent.findByPk (/app/node_modules/sequelize/lib/model.js:1221:12)
+product-service-1  |     at async Runner.eachMessage (/app/index.js:165:44)
+product-service-1  |     at async Runner.processEachMessage (/app/node_modules/kafkajs/src/consumer/runner.js:231:9)
+product-service-1  |     at async onBatch (/app/node_modules/kafkajs/src/consumer/runner.js:447:9) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "processed_events" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 116,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '138',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '661555a3-ff5c-42e0-9781-c1d6b246740d';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "processed_events" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 116,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '138',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '661555a3-ff5c-42e0-9781-c1d6b246740d';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '661555a3-ff5c-42e0-9781-c1d6b246740d';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:00:39.511 +00:00';
+product-service-1  | Error during cleanup of expired reservations: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:00:39.511 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:00:39.511 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:00:39.511 +00:00';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:05:39.518 +00:00';
+product-service-1  | Error during cleanup of expired reservations: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:05:39.518 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:05:39.518 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:05:39.518 +00:00';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (d944dac7-7128-43f5-8e72-7df3133d96b9): START TRANSACTION;
+product-service-1  | Executing (d944dac7-7128-43f5-8e72-7df3133d96b9): SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 6;
+product-service-1  | Executing (d944dac7-7128-43f5-8e72-7df3133d96b9): ROLLBACK;
+product-service-1  | Stock event sent successfully { eventType: 'STOCK_RESERVATION_FAILED' }
+product-service-1  | Error reserving stock: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async StockReservation.findOne (/app/node_modules/sequelize/lib/model.js:1240:12)
+product-service-1  |     at async /app/index.js:392:37 {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '210',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 6;',
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '210',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 6;',
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 6;',
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '28ceff8c-934e-4296-9b72-4db5ba509d6e';
+product-service-1  | Error processing order event: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async ProcessedEvent.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async ProcessedEvent.findOne (/app/node_modules/sequelize/lib/model.js:1240:12)
+product-service-1  |     at async ProcessedEvent.findByPk (/app/node_modules/sequelize/lib/model.js:1221:12)
+product-service-1  |     at async Runner.eachMessage (/app/index.js:165:44)
+product-service-1  |     at async Runner.processEachMessage (/app/node_modules/kafkajs/src/consumer/runner.js:231:9)
+product-service-1  |     at async onBatch (/app/node_modules/kafkajs/src/consumer/runner.js:447:9) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "processed_events" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 116,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '138',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '28ceff8c-934e-4296-9b72-4db5ba509d6e';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "processed_events" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 116,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '138',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '28ceff8c-934e-4296-9b72-4db5ba509d6e';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '28ceff8c-934e-4296-9b72-4db5ba509d6e';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:10:39.512 +00:00';
+product-service-1  | Error during cleanup of expired reservations: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:10:39.512 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:10:39.512 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:10:39.512 +00:00';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:15:39.519 +00:00';
+product-service-1  | Error during cleanup of expired reservations: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:15:39.519 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:15:39.519 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:15:39.519 +00:00';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (2160cde2-ab1e-4e6e-b22b-0c72f52c7c6a): START TRANSACTION;
+product-service-1  | Executing (2160cde2-ab1e-4e6e-b22b-0c72f52c7c6a): SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 7;
+product-service-1  | Executing (2160cde2-ab1e-4e6e-b22b-0c72f52c7c6a): ROLLBACK;
+product-service-1  | Stock event sent successfully { eventType: 'STOCK_RESERVATION_FAILED' }
+product-service-1  | Error reserving stock: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async StockReservation.findOne (/app/node_modules/sequelize/lib/model.js:1240:12)
+product-service-1  |     at async /app/index.js:392:37 {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '210',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 7;',
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '210',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 7;',
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: 'SELECT "id", "order_id" AS "orderId", "product_id" AS "productId", "quantity", "status", "expires_at" AS "expiresAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt", "product_id" AS "ProductId" FROM "stock_reservations" AS "StockReservation" WHERE "StockReservation"."order_id" = 7;',
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '54665b75-8dc9-49be-8ce2-4124ac2ba66c';
+product-service-1  | Error processing order event: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async ProcessedEvent.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async ProcessedEvent.findOne (/app/node_modules/sequelize/lib/model.js:1240:12)
+product-service-1  |     at async ProcessedEvent.findByPk (/app/node_modules/sequelize/lib/model.js:1221:12)
+product-service-1  |     at async Runner.eachMessage (/app/index.js:165:44)
+product-service-1  |     at async Runner.processEachMessage (/app/node_modules/kafkajs/src/consumer/runner.js:231:9)
+product-service-1  |     at async onBatch (/app/node_modules/kafkajs/src/consumer/runner.js:447:9) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "processed_events" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 116,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '138',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '54665b75-8dc9-49be-8ce2-4124ac2ba66c';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "processed_events" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 116,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '138',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '54665b75-8dc9-49be-8ce2-4124ac2ba66c';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "id", "event_type" AS "eventType", "processed_at" AS "processedAt", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "processed_events" AS "ProcessedEvent" WHERE "ProcessedEvent"."id" = '54665b75-8dc9-49be-8ce2-4124ac2ba66c';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+product-service-1  | Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:20:39.516 +00:00';
+product-service-1  | Error during cleanup of expired reservations: Error
+product-service-1  |     at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+product-service-1  |     at /app/node_modules/sequelize/lib/sequelize.js:315:28
+product-service-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+product-service-1  |     at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+product-service-1  |     at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+product-service-1  |     at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+product-service-1  |   name: 'SequelizeDatabaseError',
+product-service-1  |   parent: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:20:39.516 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   original: error: relation "stock_reservations" does not exist
+product-service-1  |       at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+product-service-1  |       at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+product-service-1  |       at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+product-service-1  |       at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+product-service-1  |       at Socket.emit (node:events:517:28)
+product-service-1  |       at addChunk (node:internal/streams/readable:368:12)
+product-service-1  |       at readableAddChunk (node:internal/streams/readable:341:9)
+product-service-1  |       at Readable.push (node:internal/streams/readable:278:10)
+product-service-1  |       at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+product-service-1  |     length: 118,
+product-service-1  |     severity: 'ERROR',
+product-service-1  |     code: '42P01',
+product-service-1  |     detail: undefined,
+product-service-1  |     hint: undefined,
+product-service-1  |     position: '674',
+product-service-1  |     internalPosition: undefined,
+product-service-1  |     internalQuery: undefined,
+product-service-1  |     where: undefined,
+product-service-1  |     schema: undefined,
+product-service-1  |     table: undefined,
+product-service-1  |     column: undefined,
+product-service-1  |     dataType: undefined,
+product-service-1  |     constraint: undefined,
+product-service-1  |     file: 'parse_relation.c',
+product-service-1  |     line: '1381',
+product-service-1  |     routine: 'parserOpenTable',
+product-service-1  |     sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:20:39.516 +00:00';`,
+product-service-1  |     parameters: undefined
+product-service-1  |   },
+product-service-1  |   sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-02-26 17:20:39.516 +00:00';`,
+product-service-1  |   parameters: {}
+product-service-1  | }
+product-service-1  | npm error path /app
+product-service-1  | npm error command failed
+product-service-1  | npm error signal SIGTERM
+product-service-1  | npm error command sh -c node index.js
+product-service-1  | npm error A complete log of this run can be found in: /home/nodejs/.npm/_logs/2026-02-26T16_40_18_226Z-debug-0.log

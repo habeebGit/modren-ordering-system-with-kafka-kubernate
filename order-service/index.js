@@ -11,7 +11,7 @@ const message = require('./lib/message');
 const dns = require('dns').promises;
 
 const app = express();
-const port = 3001;
+const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -126,19 +126,43 @@ app.post('/orders', async (req, res) => {
         );
 
         // Step 3: Send reservation request to product service (not immediate decrement)
-        const reservationRes = await axios.post(
-            process.env.PRODUCT_SERVICE_URL + '/reserve-stock',
-            { 
-                orderId: order.id,
-                items: items.map(item => ({
-                    productId: item.productId,
-                    quantity: item.quantity
-                }))
-            }
-        );
+        // Build fallback URL list for product service and try each one until success
+        const prodEnvUrl = process.env.PRODUCT_SERVICE_URL ? `${process.env.PRODUCT_SERVICE_URL}/reserve-stock` : null;
+        const prodUrls = [
+          ...(prodEnvUrl ? [prodEnvUrl] : []),
+          'http://product-service:3002/reserve-stock',
+          'http://localhost:3002/reserve-stock'
+        ];
 
-        if (!reservationRes.data.success) {
-            throw new Error(reservationRes.data.message || "Stock reservation failed");
+        let reservationRes = null;
+        let lastErr = null;
+        for (const url of prodUrls) {
+          try {
+            // Accept non-2xx responses so we can surface product-service error messages
+            reservationRes = await axios.post(url, {
+              orderId: order.id,
+              items: items.map(item => ({ productId: item.productId, quantity: item.quantity }))
+            }, { timeout: 5000, validateStatus: () => true });
+
+            // We always break once we receive a response (200 or 4xx/5xx) to inspect it
+            if (reservationRes) break;
+          } catch (err) {
+            lastErr = err;
+            logger.warn(`Reserve-stock request to ${url} failed: ${err.message}`);
+            reservationRes = null;
+            // small backoff before next attempt
+            await new Promise(r => setTimeout(r, 200));
+          }
+        }
+
+        if (!reservationRes) {
+          throw new Error(`Failed to contact Product Service for stock reservation${lastErr ? ': ' + lastErr.message : ''}`);
+        }
+
+        // If product service returned non-success, prefer its message
+        if (reservationRes.status < 200 || reservationRes.status >= 300 || !reservationRes.data || reservationRes.data.success === false) {
+          const remoteMsg = reservationRes.data && (reservationRes.data.message || reservationRes.data.error) ? (reservationRes.data.message || reservationRes.data.error) : null;
+          throw new Error(remoteMsg || `Stock reservation failed with status ${reservationRes.status}`);
         }
 
         // Step 4: Update order status to CONFIRMED
@@ -460,52 +484,34 @@ const start = async () => {
         }
     })();
 
-    const server = app.listen(port, () => {
-        console.log(`Server is running on port ${port}`);
-    });
+    const server = app.listen(PORT, () => {
+      console.info(`Server is running on port ${PORT}`)
+    })
 
-    // Graceful shutdown handlers
-    const gracefulShutdown = async () => {
-        logger.info('Shutting down gracefully...');
-        try {
-            if (server) {
-                server.close(() => logger.info('HTTP server closed'));
-            }
+    // Graceful shutdown handlers (fixed to use `consumer` and `producer`)
+    async function shutdown (signal) {
+      console.info('shutdown signal received', signal)
+      try {
+        // stop accepting new connections
+        server.close(() => console.info('HTTP server closed'))
 
-            try {
-                if (producer) {
-                    await producer.disconnect();
-                    logger.info('Kafka producer disconnected');
-                }
-            } catch (pErr) {
-                logger.warn('Error disconnecting producer', { error: pErr.message });
-            }
+        // disconnect kafka consumer/producer if present
+        if (consumer) await consumer.disconnect().catch(()=>{})
+        if (producer) await producer.disconnect().catch(()=>{})
 
-            try {
-                if (consumer) {
-                    await consumer.disconnect();
-                    logger.info('Kafka consumer disconnected');
-                }
-            } catch (cErr) {
-                logger.warn('Error disconnecting consumer', { error: cErr.message });
-            }
+        // close Sequelize connection
+        if (sequelize) await sequelize.close().catch(()=>{})
 
-            try {
-                await sequelize.close();
-                logger.info('Database connection closed');
-            } catch (dbErr) {
-                logger.warn('Error closing DB connection', { error: dbErr.message });
-            }
+        console.info('shutdown complete')
+        process.exit(0)
+      } catch (err) {
+        console.error('error during shutdown', err)
+        process.exit(1)
+      }
+    }
 
-            process.exit(0);
-        } catch (err) {
-            logger.error('Error during graceful shutdown', { error: err.message });
-            process.exit(1);
-        }
-    };
-
-    process.on('SIGINT', gracefulShutdown);
-    process.on('SIGTERM', gracefulShutdown);
+    process.on('SIGINT', () => shutdown('SIGINT'))
+    process.on('SIGTERM', () => shutdown('SIGTERM'))
 };
 start();
 

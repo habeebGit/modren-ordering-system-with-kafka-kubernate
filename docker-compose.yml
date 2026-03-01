@@ -56,7 +56,7 @@ services:
       - "5433:5432"  # Changed port to avoid conflicts
     volumes:
       - orders_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
+      - ./init-scripts/orders:/docker-entrypoint-initdb.d
     networks:
       - ordering-net
     healthcheck:
@@ -76,7 +76,7 @@ services:
       - "5434:5432"  # Different port for products DB
     volumes:
       - products_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
+      - ./init-scripts/products:/docker-entrypoint-initdb.d
     networks:
       - ordering-net
     healthcheck:
@@ -104,6 +104,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: password
       KAFKA_BROKERS: kafka:9092
+      PRODUCT_SERVICE_URL: http://product-service:3002
     networks:
       - ordering-net
     restart: unless-stopped
@@ -150,6 +151,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      REACT_APP_API_URL: http://order-service:3001
       REACT_APP_ORDER_SERVICE_URL: http://order-service:3001
       REACT_APP_PRODUCT_SERVICE_URL: http://product-service:3002
       CHOKIDAR_USEPOLLING: "true"

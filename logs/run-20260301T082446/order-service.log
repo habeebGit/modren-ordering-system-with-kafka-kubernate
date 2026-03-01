@@ -1,0 +1,228 @@
+time="2026-03-01T08:24:48-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+order-service-1  | Running migrations for order-service...
+order-service-1  | 
+order-service-1  | Sequelize CLI [Node: 18.20.8, CLI: 6.6.5, ORM: 6.37.7]
+order-service-1  | 
+order-service-1  | Loaded configuration file "sequelize-config.js".
+order-service-1  | Using environment "production".
+order-service-1  | == 20260226-add-stock-reservations: migrating =======
+order-service-1  | == 20260226-add-stock-reservations: migrated (0.016s)
+order-service-1  | 
+order-service-1  | == 20260226-alter-products-add-columns: migrating =======
+order-service-1  | == 20260226-alter-products-add-columns: migrated (0.004s)
+order-service-1  | 
+order-service-1  | == 20260226-create-orders: migrating =======
+order-service-1  | == 20260226-create-orders: migrated (0.020s)
+order-service-1  | 
+order-service-1  | == 20260226-create-products: migrating =======
+order-service-1  | == 20260226-create-products: migrated (0.003s)
+order-service-1  | 
+order-service-1  | npm notice
+order-service-1  | npm notice New major version of npm available! 10.8.2 -> 11.11.0
+order-service-1  | npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.11.0
+order-service-1  | npm notice To update run: npm install -g npm@11.11.0
+order-service-1  | npm notice
+order-service-1  | [dotenv@17.3.1] injecting env (8) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+order-service-1  | {"level":"WARN","timestamp":"2026-03-01T07:33:42.818Z","logger":"kafkajs","message":"KafkaJS v2.0.0 switched default partitioner. To retain the same partitioning behavior as in previous versions, create the producer with the option \"createPartitioner: Partitioners.LegacyPartitioner\". See the migration guide at https://kafka.js.org/docs/migration-guide-v2.0.0#producer-new-default-partitioner for details. Silence this warning by setting the environment variable \"KAFKAJS_NO_PARTITIONER_WARNING=1\""}
+order-service-1  | Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'Orders'
+order-service-1  | Executing (default): SELECT pk.constraint_type as "Constraint",c.column_name as "Field", c.column_default as "Default",c.is_nullable as "Null", (CASE WHEN c.udt_name = 'hstore' THEN c.udt_name ELSE c.data_type END) || (CASE WHEN c.character_maximum_length IS NOT NULL THEN '(' || c.character_maximum_length || ')' ELSE '' END) as "Type", (SELECT array_agg(e.enumlabel) FROM pg_catalog.pg_type t JOIN pg_catalog.pg_enum e ON t.oid=e.enumtypid WHERE t.typname=c.udt_name) AS "special", (SELECT pgd.description FROM pg_catalog.pg_statio_all_tables AS st INNER JOIN pg_catalog.pg_description pgd on (pgd.objoid=st.relid) WHERE c.ordinal_position=pgd.objsubid AND c.table_name=st.relname) AS "Comment" FROM information_schema.columns c LEFT JOIN (SELECT tc.table_schema, tc.table_name, cu.column_name, tc.constraint_type FROM information_schema.TABLE_CONSTRAINTS tc JOIN information_schema.KEY_COLUMN_USAGE  cu ON tc.table_schema=cu.table_schema and tc.table_name=cu.table_name and tc.constraint_name=cu.constraint_name and tc.constraint_type='PRIMARY KEY') pk ON pk.table_schema=c.table_schema AND pk.table_name=c.table_name AND pk.column_name=c.column_name WHERE c.table_name = 'Orders' AND c.table_schema = 'public'
+order-service-1  | Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'Orders' AND tc.table_catalog = 'orders_db'
+order-service-1  | Executing (default): ALTER TABLE "Orders" ALTER COLUMN "userId" SET NOT NULL;ALTER TABLE "Orders" ALTER COLUMN "userId" DROP DEFAULT;ALTER TABLE "Orders" ALTER COLUMN "userId" TYPE INTEGER;
+order-service-1  | Executing (default): ALTER TABLE "Orders" ALTER COLUMN "status" DROP NOT NULL;ALTER TABLE "Orders" ALTER COLUMN "status" SET DEFAULT 'Pending';ALTER TABLE "Orders" ALTER COLUMN "status" TYPE VARCHAR(255);
+order-service-1  | Executing (default): ALTER TABLE "Orders" ALTER COLUMN "createdAt" SET NOT NULL;ALTER TABLE "Orders" ALTER COLUMN "createdAt" DROP DEFAULT;ALTER TABLE "Orders" ALTER COLUMN "createdAt" TYPE TIMESTAMP WITH TIME ZONE;
+order-service-1  | Executing (default): ALTER TABLE "Orders" ALTER COLUMN "updatedAt" SET NOT NULL;ALTER TABLE "Orders" ALTER COLUMN "updatedAt" DROP DEFAULT;ALTER TABLE "Orders" ALTER COLUMN "updatedAt" TYPE TIMESTAMP WITH TIME ZONE;
+order-service-1  | Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'Orders' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+order-service-1  | Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'OrderItems'
+order-service-1  | Executing (default): SELECT pk.constraint_type as "Constraint",c.column_name as "Field", c.column_default as "Default",c.is_nullable as "Null", (CASE WHEN c.udt_name = 'hstore' THEN c.udt_name ELSE c.data_type END) || (CASE WHEN c.character_maximum_length IS NOT NULL THEN '(' || c.character_maximum_length || ')' ELSE '' END) as "Type", (SELECT array_agg(e.enumlabel) FROM pg_catalog.pg_type t JOIN pg_catalog.pg_enum e ON t.oid=e.enumtypid WHERE t.typname=c.udt_name) AS "special", (SELECT pgd.description FROM pg_catalog.pg_statio_all_tables AS st INNER JOIN pg_catalog.pg_description pgd on (pgd.objoid=st.relid) WHERE c.ordinal_position=pgd.objsubid AND c.table_name=st.relname) AS "Comment" FROM information_schema.columns c LEFT JOIN (SELECT tc.table_schema, tc.table_name, cu.column_name, tc.constraint_type FROM information_schema.TABLE_CONSTRAINTS tc JOIN information_schema.KEY_COLUMN_USAGE  cu ON tc.table_schema=cu.table_schema and tc.table_name=cu.table_name and tc.constraint_name=cu.constraint_name and tc.constraint_type='PRIMARY KEY') pk ON pk.table_schema=c.table_schema AND pk.table_name=c.table_name AND pk.column_name=c.column_name WHERE c.table_name = 'OrderItems' AND c.table_schema = 'public'
+order-service-1  | Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'OrderItems' AND tc.table_catalog = 'orders_db'
+order-service-1  | Executing (default): ALTER TABLE "OrderItems" DROP CONSTRAINT "OrderItems_OrderId_fkey"
+order-service-1  | Executing (default): ALTER TABLE "OrderItems"  ADD FOREIGN KEY ("OrderId") REFERENCES "Orders" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+order-service-1  | Executing (default): ALTER TABLE "OrderItems" ALTER COLUMN "productId" SET NOT NULL;ALTER TABLE "OrderItems" ALTER COLUMN "productId" DROP DEFAULT;ALTER TABLE "OrderItems" ALTER COLUMN "productId" TYPE INTEGER;
+order-service-1  | Executing (default): ALTER TABLE "OrderItems" ALTER COLUMN "quantity" SET NOT NULL;ALTER TABLE "OrderItems" ALTER COLUMN "quantity" DROP DEFAULT;ALTER TABLE "OrderItems" ALTER COLUMN "quantity" TYPE INTEGER;
+order-service-1  | Executing (default): ALTER TABLE "OrderItems" ALTER COLUMN "createdAt" SET NOT NULL;ALTER TABLE "OrderItems" ALTER COLUMN "createdAt" DROP DEFAULT;ALTER TABLE "OrderItems" ALTER COLUMN "createdAt" TYPE TIMESTAMP WITH TIME ZONE;
+order-service-1  | Executing (default): ALTER TABLE "OrderItems" ALTER COLUMN "updatedAt" SET NOT NULL;ALTER TABLE "OrderItems" ALTER COLUMN "updatedAt" DROP DEFAULT;ALTER TABLE "OrderItems" ALTER COLUMN "updatedAt" TYPE TIMESTAMP WITH TIME ZONE;
+order-service-1  | Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'OrderItems' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+order-service-1  | Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'ProcessedEvents'
+order-service-1  | Executing (default): SELECT pk.constraint_type as "Constraint",c.column_name as "Field", c.column_default as "Default",c.is_nullable as "Null", (CASE WHEN c.udt_name = 'hstore' THEN c.udt_name ELSE c.data_type END) || (CASE WHEN c.character_maximum_length IS NOT NULL THEN '(' || c.character_maximum_length || ')' ELSE '' END) as "Type", (SELECT array_agg(e.enumlabel) FROM pg_catalog.pg_type t JOIN pg_catalog.pg_enum e ON t.oid=e.enumtypid WHERE t.typname=c.udt_name) AS "special", (SELECT pgd.description FROM pg_catalog.pg_statio_all_tables AS st INNER JOIN pg_catalog.pg_description pgd on (pgd.objoid=st.relid) WHERE c.ordinal_position=pgd.objsubid AND c.table_name=st.relname) AS "Comment" FROM information_schema.columns c LEFT JOIN (SELECT tc.table_schema, tc.table_name, cu.column_name, tc.constraint_type FROM information_schema.TABLE_CONSTRAINTS tc JOIN information_schema.KEY_COLUMN_USAGE  cu ON tc.table_schema=cu.table_schema and tc.table_name=cu.table_name and tc.constraint_name=cu.constraint_name and tc.constraint_type='PRIMARY KEY') pk ON pk.table_schema=c.table_schema AND pk.table_name=c.table_name AND pk.column_name=c.column_name WHERE c.table_name = 'ProcessedEvents' AND c.table_schema = 'public'
+order-service-1  | Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'ProcessedEvents' AND tc.table_catalog = 'orders_db'
+order-service-1  | Executing (default): ALTER TABLE "public"."ProcessedEvents" ADD COLUMN "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL;
+order-service-1  | Executing (default): ALTER TABLE "public"."ProcessedEvents" ADD COLUMN "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL;
+order-service-1  | Executing (default): ALTER TABLE "ProcessedEvents" ALTER COLUMN "eventType" SET NOT NULL;ALTER TABLE "ProcessedEvents" ALTER COLUMN "eventType" DROP DEFAULT;ALTER TABLE "ProcessedEvents" ALTER COLUMN "eventType" TYPE VARCHAR(255);
+order-service-1  | Executing (default): ALTER TABLE "ProcessedEvents" ALTER COLUMN "processedAt" SET NOT NULL;ALTER TABLE "ProcessedEvents" ALTER COLUMN "processedAt" DROP DEFAULT;ALTER TABLE "ProcessedEvents" ALTER COLUMN "processedAt" TYPE TIMESTAMP WITH TIME ZONE;
+order-service-1  | Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'ProcessedEvents' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+order-service-1  | Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'DeadLetterEvents'
+order-service-1  | Executing (default): SELECT pk.constraint_type as "Constraint",c.column_name as "Field", c.column_default as "Default",c.is_nullable as "Null", (CASE WHEN c.udt_name = 'hstore' THEN c.udt_name ELSE c.data_type END) || (CASE WHEN c.character_maximum_length IS NOT NULL THEN '(' || c.character_maximum_length || ')' ELSE '' END) as "Type", (SELECT array_agg(e.enumlabel) FROM pg_catalog.pg_type t JOIN pg_catalog.pg_enum e ON t.oid=e.enumtypid WHERE t.typname=c.udt_name) AS "special", (SELECT pgd.description FROM pg_catalog.pg_statio_all_tables AS st INNER JOIN pg_catalog.pg_description pgd on (pgd.objoid=st.relid) WHERE c.ordinal_position=pgd.objsubid AND c.table_name=st.relname) AS "Comment" FROM information_schema.columns c LEFT JOIN (SELECT tc.table_schema, tc.table_name, cu.column_name, tc.constraint_type FROM information_schema.TABLE_CONSTRAINTS tc JOIN information_schema.KEY_COLUMN_USAGE  cu ON tc.table_schema=cu.table_schema and tc.table_name=cu.table_name and tc.constraint_name=cu.constraint_name and tc.constraint_type='PRIMARY KEY') pk ON pk.table_schema=c.table_schema AND pk.table_name=c.table_name AND pk.column_name=c.column_name WHERE c.table_name = 'DeadLetterEvents' AND c.table_schema = 'public'
+order-service-1  | Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'DeadLetterEvents' AND tc.table_catalog = 'orders_db'
+order-service-1  | Executing (default): ALTER TABLE "public"."DeadLetterEvents" ADD COLUMN "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL;
+order-service-1  | Executing (default): ALTER TABLE "DeadLetterEvents" ALTER COLUMN "eventType" DROP NOT NULL;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "eventType" DROP DEFAULT;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "eventType" TYPE VARCHAR(255);
+order-service-1  | Executing (default): ALTER TABLE "DeadLetterEvents" ALTER COLUMN "payload" DROP NOT NULL;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "payload" DROP DEFAULT;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "payload" TYPE JSON;
+order-service-1  | Executing (default): ALTER TABLE "DeadLetterEvents" ALTER COLUMN "errorMessage" DROP NOT NULL;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "errorMessage" DROP DEFAULT;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "errorMessage" TYPE TEXT;
+order-service-1  | Executing (default): ALTER TABLE "DeadLetterEvents" ALTER COLUMN "createdAt" DROP NOT NULL;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "createdAt" DROP DEFAULT;ALTER TABLE "DeadLetterEvents" ALTER COLUMN "createdAt" TYPE TIMESTAMP WITH TIME ZONE;
+order-service-1  | Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'DeadLetterEvents' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+order-service-1  | {"level":"info","message":"Kafka producer connected","timestamp":"2026-03-01T07:33:42.921Z"}
+order-service-1  | Server is running on port 3001
+order-service-1  | {"level":"ERROR","timestamp":"2026-03-01T07:33:43.030Z","logger":"kafkajs","message":"[Connection] Response Metadata(key: 3, version: 6)","broker":"kafka:9092","clientId":"kafkajs","error":"There is no leader for this topic-partition as we are in the middle of a leadership election","correlationId":1,"size":82}
+order-service-1  | {"level":"ERROR","timestamp":"2026-03-01T07:33:43.372Z","logger":"kafkajs","message":"[Connection] Response Metadata(key: 3, version: 6)","broker":"kafka:9092","clientId":"kafkajs","error":"There is no leader for this topic-partition as we are in the middle of a leadership election","correlationId":2,"size":82}
+order-service-1  | {"level":"INFO","timestamp":"2026-03-01T07:33:43.925Z","logger":"kafkajs","message":"[Consumer] Starting","groupId":"order-service-group"}
+order-service-1  | {"level":"ERROR","timestamp":"2026-03-01T07:33:43.967Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":4,"size":55}
+order-service-1  | {"level":"ERROR","timestamp":"2026-03-01T07:33:44.317Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":5,"size":55}
+order-service-1  | {"level":"ERROR","timestamp":"2026-03-01T07:33:44.926Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":6,"size":55}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:33:45 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:33:45.497Z"}
+order-service-1  | {"level":"INFO","timestamp":"2026-03-01T07:33:46.242Z","logger":"kafkajs","message":"[ConsumerGroup] Consumer has joined the group","groupId":"order-service-group","memberId":"kafkajs-dd866a25-a51c-4130-952e-d351cce6031b","leaderId":"kafkajs-dd866a25-a51c-4130-952e-d351cce6031b","isLeader":true,"memberAssignment":{"order-events":[0]},"groupProtocol":"RoundRobinAssigner","duration":2316}
+order-service-1  | {"level":"info","message":"Kafka consumer started","timestamp":"2026-03-01T07:33:46.243Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:33:46.472Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:33:46 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:33:46.474Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:33:56.578Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:33:56 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:33:56.579Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:34:00 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:34:00.502Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:34:06.669Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:34:06 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:34:06.670Z"}
+order-service-1  | {"level":"info","message":"::ffff:142.250.115.207 - - [01/Mar/2026:07:34:15 +0000] \"GET / HTTP/1.1\" 200 24 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:148.0) Gecko/20100101 Firefox/148.0\"","timestamp":"2026-03-01T07:34:15.214Z"}
+order-service-1  | {"level":"info","message":"::ffff:142.250.115.207 - - [01/Mar/2026:07:34:15 +0000] \"GET /favicon.ico HTTP/1.1\" 404 150 \"http://localhost:3001/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:148.0) Gecko/20100101 Firefox/148.0\"","timestamp":"2026-03-01T07:34:15.507Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:34:15 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:34:15.516Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:34:16.790Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:34:16 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:34:16.791Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:34:26.968Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:34:26 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:34:26.970Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:34:30 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:34:30.494Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:34:37.073Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:34:37 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:34:37.074Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:34:45 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:34:45.497Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:34:47.182Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:34:47 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:34:47.183Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:34:57.459Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:34:57 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:34:57.471Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:35:00 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:35:00.497Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:35:07.627Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:35:07 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:35:07.631Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:35:15 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:35:15.505Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:35:17.729Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:35:17 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:35:17.730Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:35:27.839Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:35:27 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:35:27.840Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:35:30 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:35:30.497Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:35:37.937Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:35:37 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:35:37.939Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:35:45 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:35:45.507Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:35:48.020Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:35:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:35:48.021Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:35:58.118Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:35:58 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:35:58.119Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:36:00 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:36:00.501Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:36:08.228Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:36:08 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:36:08.229Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:36:15 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:36:15.503Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:36:18.309Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:36:18 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:36:18.310Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:36:28.413Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:36:28 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:36:28.414Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:36:30 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:36:30.489Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:36:38.514Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:36:38 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:36:38.515Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:36:45 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:36:45.498Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:36:48.633Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:36:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:36:48.635Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:36:58.715Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:36:58 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:36:58.716Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:37:00 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:37:00.498Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:37:08.844Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:37:08 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:37:08.846Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:37:15 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:37:15.495Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:37:18.932Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:37:18 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:37:18.932Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:37:29.010Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:37:29 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:37:29.010Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:37:30 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:37:30.502Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:37:39.085Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:37:39 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:37:39.085Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:37:45 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:37:45.491Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:37:49.161Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:37:49 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:37:49.162Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:37:59.253Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:37:59 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:37:59.254Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:38:00 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:38:00.490Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:38:09.338Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:38:09 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:38:09.339Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:38:15 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:38:15.494Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:38:19.410Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:38:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:38:19.411Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:38:29.520Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:38:29 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:38:29.520Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:38:30 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:38:30.494Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:38:39.598Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:38:39 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:38:39.599Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:38:45 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:38:45.492Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:38:49.673Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:38:49 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:38:49.673Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:38:59.774Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:38:59 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:38:59.775Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:39:00 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:39:00.493Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:39:09.878Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:39:09 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:39:09.879Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:39:15 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:39:15.499Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:39:19.961Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:39:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:39:19.961Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:39:30.069Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:39:30 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:39:30.071Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:39:30 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:39:30.487Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:39:40.159Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:39:40 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:39:40.160Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:39:45 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:39:45.500Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:39:50.319Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:39:50 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:39:50.323Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:40:00.410Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:40:00 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:40:00.411Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:40:00 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:40:00.493Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T07:40:10.527Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:07:40:10 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T07:40:10.530Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:07:40:15 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T07:40:15.500Z"}
+order-service-1  | {"level":"WARN","timestamp":"2026-03-01T09:07:48.193Z","logger":"kafkajs","message":"[RequestQueue] Response without match","clientId":"kafkajs","broker":"kafka:9092","correlationId":77}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T09:07:50.938Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:09:07:50 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T09:07:50.939Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:09:08:00 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T09:08:00.811Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T09:08:01.042Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:09:08:01 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T09:08:01.043Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T09:08:11.135Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:09:08:11 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T09:08:11.135Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:09:08:15 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T09:08:15.813Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T09:08:21.240Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:09:08:21 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T09:08:21.242Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:09:08:30 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T09:08:30.817Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T09:08:31.350Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:09:08:31 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T09:08:31.351Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T09:08:41.441Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:09:08:41 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T09:08:41.442Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:09:08:45 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T09:08:45.808Z"}
+order-service-1  | {"level":"WARN","timestamp":"2026-03-01T09:41:24.148Z","logger":"kafkajs","message":"[RequestQueue] Response without match","clientId":"kafkajs","broker":"kafka:9092","correlationId":89}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T09:41:27.097Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:09:41:27 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T09:41:27.098Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:09:41:36 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T09:41:36.375Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T09:41:37.186Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:09:41:37 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T09:41:37.186Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T09:41:47.295Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:09:41:47 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T09:41:47.299Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:09:41:51 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T09:41:51.390Z"}
+order-service-1  | {"level":"WARN","timestamp":"2026-03-01T10:33:45.273Z","logger":"kafkajs","message":"[RequestQueue] Response without match","clientId":"kafkajs","broker":"kafka:9092","correlationId":95}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T10:33:48.382Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:10:33:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T10:33:48.382Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:10:33:57 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T10:33:57.379Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T10:33:58.474Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:10:33:58 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T10:33:58.475Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T10:34:08.557Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:10:34:08 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T10:34:08.557Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:10:34:12 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T10:34:12.379Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T10:34:18.638Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:10:34:18 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T10:34:18.639Z"}
+order-service-1  | {"level":"info","message":"::ffff:172.18.0.2 - - [01/Mar/2026:10:34:27 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T10:34:27.378Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T10:34:28.741Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:10:34:28 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T10:34:28.741Z"}
+order-service-1  | {"level":"info","message":"Health check requested","timestamp":"2026-03-01T10:34:38.838Z"}
+order-service-1  | {"level":"info","message":"::1 - - [01/Mar/2026:10:34:38 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T10:34:38.840Z"}
+order-service-1  | {"level":"info","message":"Shutting down gracefully...","timestamp":"2026-03-01T10:34:41.108Z"}
+order-service-1  | {"level":"info","message":"HTTP server closed","timestamp":"2026-03-01T10:34:41.112Z"}
+order-service-1  | {"level":"info","message":"Kafka producer disconnected","timestamp":"2026-03-01T10:34:41.113Z"}
+order-service-1  | {"level":"INFO","timestamp":"2026-03-01T10:34:41.383Z","logger":"kafkajs","message":"[Runner] consumer not running, exiting","groupId":"order-service-group","memberId":"kafkajs-dd866a25-a51c-4130-952e-d351cce6031b"}
+order-service-1  | {"level":"ERROR","timestamp":"2026-03-01T10:34:41.396Z","logger":"kafkajs","message":"[Connection] Connection error: connect ECONNREFUSED 172.18.0.7:9092","broker":"kafka:9092","clientId":"kafkajs","stack":"Error: connect ECONNREFUSED 172.18.0.7:9092\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"}
+order-service-1  | {"level":"INFO","timestamp":"2026-03-01T10:34:41.396Z","logger":"kafkajs","message":"[Consumer] Stopped","groupId":"order-service-group"}
+order-service-1  | {"level":"info","message":"Kafka consumer disconnected","timestamp":"2026-03-01T10:34:41.396Z"}
+order-service-1  | {"level":"info","message":"Database connection closed","timestamp":"2026-03-01T10:34:41.397Z"}

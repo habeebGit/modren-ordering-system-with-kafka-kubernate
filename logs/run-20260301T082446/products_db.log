@@ -1,0 +1,90 @@
+time="2026-03-01T08:24:47-06:00" level=warning msg="/Users/habeebmohammed/software/modren-ordering-system-with-kafka-kubernate/modren-ordering-system-with-kafka/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+products_db-1  | The files belonging to this database system will be owned by user "postgres".
+products_db-1  | This user must also own the server process.
+products_db-1  | 
+products_db-1  | The database cluster will be initialized with locale "en_US.utf8".
+products_db-1  | The default database encoding has accordingly been set to "UTF8".
+products_db-1  | The default text search configuration will be set to "english".
+products_db-1  | 
+products_db-1  | Data page checksums are disabled.
+products_db-1  | 
+products_db-1  | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+products_db-1  | creating subdirectories ... ok
+products_db-1  | selecting dynamic shared memory implementation ... posix
+products_db-1  | selecting default max_connections ... 100
+products_db-1  | selecting default shared_buffers ... 128MB
+products_db-1  | selecting default time zone ... Etc/UTC
+products_db-1  | creating configuration files ... ok
+products_db-1  | running bootstrap script ... ok
+products_db-1  | performing post-bootstrap initialization ... ok
+products_db-1  | initdb: warning: enabling "trust" authentication for local connections
+products_db-1  | You can change this by editing pg_hba.conf or using the option -A, or
+products_db-1  | --auth-local and --auth-host, the next time you run initdb.
+products_db-1  | syncing data to disk ... ok
+products_db-1  | 
+products_db-1  | 
+products_db-1  | Success. You can now start the database server using:
+products_db-1  | 
+products_db-1  |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+products_db-1  | 
+products_db-1  | waiting for server to start....2026-03-01 07:33:28.005 UTC [47] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+products_db-1  | 2026-03-01 07:33:28.007 UTC [47] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+products_db-1  | 2026-03-01 07:33:28.012 UTC [48] LOG:  database system was shut down at 2026-03-01 07:33:27 UTC
+products_db-1  | 2026-03-01 07:33:28.016 UTC [47] LOG:  database system is ready to accept connections
+products_db-1  |  done
+products_db-1  | server started
+products_db-1  | CREATE DATABASE
+products_db-1  | 
+products_db-1  | 
+products_db-1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/00-init.sql
+products_db-1  | CREATE EXTENSION
+products_db-1  | 
+products_db-1  | 
+products_db-1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/01-seed-products.sql
+products_db-1  | CREATE TABLE
+products_db-1  | INSERT 0 8
+products_db-1  | 
+products_db-1  | 
+products_db-1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/02-seed-orders.sql
+products_db-1  | CREATE TABLE
+products_db-1  | CREATE TABLE
+products_db-1  | INSERT 0 3
+products_db-1  | INSERT 0 6
+products_db-1  | 
+products_db-1  | 
+products_db-1  | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init-database.sql
+products_db-1  | DO
+products_db-1  | psql:/docker-entrypoint-initdb.d/init-database.sql:12: NOTICE:  Role setup done
+products_db-1  | DO
+products_db-1  | DO
+products_db-1  | 
+products_db-1  | 
+products_db-1  | waiting for server to shut down....2026-03-01 07:33:28.414 UTC [47] LOG:  received fast shutdown request
+products_db-1  | 2026-03-01 07:33:28.415 UTC [47] LOG:  aborting any active transactions
+products_db-1  | 2026-03-01 07:33:28.417 UTC [47] LOG:  background worker "logical replication launcher" (PID 54) exited with exit code 1
+products_db-1  | 2026-03-01 07:33:28.417 UTC [49] LOG:  shutting down
+products_db-1  | 2026-03-01 07:33:28.445 UTC [47] LOG:  database system is shut down
+products_db-1  |  done
+products_db-1  | server stopped
+products_db-1  | 
+products_db-1  | PostgreSQL init process complete; ready for start up.
+products_db-1  | 
+products_db-1  | 2026-03-01 07:33:28.528 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+products_db-1  | 2026-03-01 07:33:28.528 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+products_db-1  | 2026-03-01 07:33:28.528 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+products_db-1  | 2026-03-01 07:33:28.529 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+products_db-1  | 2026-03-01 07:33:28.532 UTC [70] LOG:  database system was shut down at 2026-03-01 07:33:28 UTC
+products_db-1  | 2026-03-01 07:33:28.535 UTC [1] LOG:  database system is ready to accept connections
+products_db-1  | 2026-03-01 07:34:07.765 UTC [95] ERROR:  column "reserved_stock" does not exist at character 40
+products_db-1  | 2026-03-01 07:34:07.765 UTC [95] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+products_db-1  | 2026-03-01 07:34:07.772 UTC [95] ERROR:  column "reserved_stock" does not exist at character 40
+products_db-1  | 2026-03-01 07:34:07.772 UTC [95] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+products_db-1  | 2026-03-01 07:34:49.622 UTC [105] ERROR:  column "reserved_stock" of relation "products" does not exist at character 53
+products_db-1  | 2026-03-01 07:34:49.622 UTC [105] STATEMENT:  INSERT INTO "products" ("id","name","price","stock","reserved_stock","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","name","price","stock","reserved_stock","created_at","updated_at";
+products_db-1  | 2026-03-01 07:38:43.034 UTC [178] ERROR:  relation "stock_reservations" does not exist at character 674
+products_db-1  | 2026-03-01 07:38:43.034 UTC [178] STATEMENT:  SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 07:38:43.011 +00:00';
+products_db-1  | 2026-03-01 10:34:41.113 UTC [1] LOG:  received fast shutdown request
+products_db-1  | 2026-03-01 10:34:41.119 UTC [1] LOG:  aborting any active transactions
+products_db-1  | 2026-03-01 10:34:41.130 UTC [1] LOG:  background worker "logical replication launcher" (PID 76) exited with exit code 1
+products_db-1  | 2026-03-01 10:34:41.131 UTC [71] LOG:  shutting down
+products_db-1  | 2026-03-01 10:34:41.157 UTC [1] LOG:  database system is shut down

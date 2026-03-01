@@ -100,10 +100,12 @@ function ensureBlock() {
   _context.setup.call(body, parentPath, listKey ? parentPath.node[listKey] : parentPath.node, listKey, key);
   return this.node;
 }
-exports.arrowFunctionToShadowed = function () {
-  if (!this.isArrowFunctionExpression()) return;
-  this.arrowFunctionToExpression();
-};
+{
+  exports.arrowFunctionToShadowed = function () {
+    if (!this.isArrowFunctionExpression()) return;
+    this.arrowFunctionToExpression();
+  };
+}
 function unwrapFunctionEnvironment() {
   if (!this.isArrowFunctionExpression() && !this.isFunctionExpression() && !this.isFunctionDeclaration()) {
     throw this.buildCodeFrameError("Can only unwrap the environment of a function.");
@@ -283,7 +285,7 @@ function hoistFunctionEnvironment(fnPath, noNewArrows = true, allowInsertArrow =
     }
   }
   return {
-    thisBinding: thisBinding,
+    thisBinding,
     fnPath
   };
 }
@@ -298,10 +300,8 @@ function standardizeSuperProperty(superProp) {
     const isLogicalAssignment = isLogicalOp(op);
     if (superProp.node.computed) {
       const tmp = superProp.scope.generateDeclaredUidIdentifier("tmp");
-      const {
-        object,
-        property
-      } = superProp.node;
+      const object = superProp.node.object;
+      const property = superProp.node.property;
       assignmentPath.get("left").replaceWith(memberExpression(object, assignmentExpression("=", tmp, property), true));
       assignmentPath.get("right").replaceWith(rightExpression(isLogicalAssignment ? "=" : op, memberExpression(object, identifier(tmp.name), true), value));
     } else {
@@ -570,13 +570,17 @@ function ensureFunctionName(supportUnicodeId) {
   }
   if (!state.needsRename) {
     this.node.id = id;
-    scope.getProgramParent().references[id.name] = true;
+    {
+      scope.getProgramParent().references[id.name] = true;
+    }
     return this;
   }
   if (scope.hasBinding(id.name) && !scope.hasGlobal(id.name)) {
     scope.rename(id.name);
     this.node.id = id;
-    scope.getProgramParent().references[id.name] = true;
+    {
+      scope.getProgramParent().references[id.name] = true;
+    }
     return this;
   }
   if (!isFunction(this.node)) return null;
