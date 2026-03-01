@@ -1,0 +1,267 @@
+Running migrations for product-service...
+
+Sequelize CLI [Node: 18.20.8, CLI: 6.6.5, ORM: 6.37.7]
+
+Loaded configuration file "sequelize-config.js".
+Using environment "production".
+== 20260226-create-products: migrating =======
+== 20260226-create-products: migrated (0.009s)
+
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.11.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.11.0
+npm notice To update run: npm install -g npm@11.11.0
+npm notice
+
+> product-service@1.0.0 start
+> node index.js
+
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+{"level":"WARN","timestamp":"2026-03-01T16:32:14.157Z","logger":"kafkajs","message":"KafkaJS v2.0.0 switched default partitioner. To retain the same partitioning behavior as in previous versions, create the producer with the option \"createPartitioner: Partitioners.LegacyPartitioner\". See the migration guide at https://kafka.js.org/docs/migration-guide-v2.0.0#producer-new-default-partitioner for details. Silence this warning by setting the environment variable \"KAFKAJS_NO_PARTITIONER_WARNING=1\""}
+Product Service running on port 3002
+Creating new Kafka consumer instance (attempt 1)
+Kafka producer connected for product-service (attempt 1)
+Kafka consumer connected (attempt 1)
+{"level":"INFO","timestamp":"2026-03-01T16:32:14.185Z","logger":"kafkajs","message":"[Consumer] Starting","groupId":"product-group"}
+{"level":"INFO","timestamp":"2026-03-01T16:32:14.311Z","logger":"kafkajs","message":"[ConsumerGroup] Consumer has joined the group","groupId":"product-group","memberId":"kafkajs-ffb38fe0-bd3b-46c8-b9d8-d3fd3097bdca","leaderId":"kafkajs-ffb38fe0-bd3b-46c8-b9d8-d3fd3097bdca","isLeader":true,"memberAssignment":{"order-events":[0]},"groupProtocol":"RoundRobinAssigner","duration":125}
+Kafka consumer started successfully
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:37:14.159 +00:00';
+Error during cleanup of expired reservations: Error
+    at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+    at /app/node_modules/sequelize/lib/sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+    at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+    at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+  name: 'SequelizeDatabaseError',
+  parent: error: column StockReservation.expires_at does not exist
+      at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+      at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+      at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+      at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+      at Socket.emit (node:events:517:28)
+      at addChunk (node:internal/streams/readable:368:12)
+      at readableAddChunk (node:internal/streams/readable:341:9)
+      at Readable.push (node:internal/streams/readable:278:10)
+      at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+    length: 126,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '185',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3647',
+    routine: 'errorMissingColumn',
+    sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:37:14.159 +00:00';`,
+    parameters: undefined
+  },
+  original: error: column StockReservation.expires_at does not exist
+      at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+      at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+      at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+      at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+      at Socket.emit (node:events:517:28)
+      at addChunk (node:internal/streams/readable:368:12)
+      at readableAddChunk (node:internal/streams/readable:341:9)
+      at Readable.push (node:internal/streams/readable:278:10)
+      at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+    length: 126,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '185',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3647',
+    routine: 'errorMissingColumn',
+    sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:37:14.159 +00:00';`,
+    parameters: undefined
+  },
+  sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:37:14.159 +00:00';`,
+  parameters: {}
+}
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:42:14.163 +00:00';
+Error during cleanup of expired reservations: Error
+    at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+    at /app/node_modules/sequelize/lib/sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+    at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+    at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+  name: 'SequelizeDatabaseError',
+  parent: error: column StockReservation.expires_at does not exist
+      at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+      at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+      at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+      at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+      at Socket.emit (node:events:517:28)
+      at addChunk (node:internal/streams/readable:368:12)
+      at readableAddChunk (node:internal/streams/readable:341:9)
+      at Readable.push (node:internal/streams/readable:278:10)
+      at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+    length: 126,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '185',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3647',
+    routine: 'errorMissingColumn',
+    sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:42:14.163 +00:00';`,
+    parameters: undefined
+  },
+  original: error: column StockReservation.expires_at does not exist
+      at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+      at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+      at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+      at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+      at Socket.emit (node:events:517:28)
+      at addChunk (node:internal/streams/readable:368:12)
+      at readableAddChunk (node:internal/streams/readable:341:9)
+      at Readable.push (node:internal/streams/readable:278:10)
+      at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+    length: 126,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '185',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3647',
+    routine: 'errorMissingColumn',
+    sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:42:14.163 +00:00';`,
+    parameters: undefined
+  },
+  sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:42:14.163 +00:00';`,
+  parameters: {}
+}
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+Executing (default): SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:47:14.163 +00:00';
+Error during cleanup of expired reservations: Error
+    at Query.run (/app/node_modules/sequelize/lib/dialects/postgres/query.js:50:25)
+    at /app/node_modules/sequelize/lib/sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PostgresQueryInterface.select (/app/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+    at async StockReservation.findAll (/app/node_modules/sequelize/lib/model.js:1140:21)
+    at async Timeout.cleanupExpiredReservations [as _onTimeout] (/app/index.js:544:37) {
+  name: 'SequelizeDatabaseError',
+  parent: error: column StockReservation.expires_at does not exist
+      at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+      at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+      at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+      at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+      at Socket.emit (node:events:517:28)
+      at addChunk (node:internal/streams/readable:368:12)
+      at readableAddChunk (node:internal/streams/readable:341:9)
+      at Readable.push (node:internal/streams/readable:278:10)
+      at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+    length: 126,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '185',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3647',
+    routine: 'errorMissingColumn',
+    sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:47:14.163 +00:00';`,
+    parameters: undefined
+  },
+  original: error: column StockReservation.expires_at does not exist
+      at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:285:98)
+      at Parser.handlePacket (/app/node_modules/pg-protocol/dist/parser.js:122:29)
+      at Parser.parse (/app/node_modules/pg-protocol/dist/parser.js:35:38)
+      at Socket.<anonymous> (/app/node_modules/pg-protocol/dist/index.js:11:42)
+      at Socket.emit (node:events:517:28)
+      at addChunk (node:internal/streams/readable:368:12)
+      at readableAddChunk (node:internal/streams/readable:341:9)
+      at Readable.push (node:internal/streams/readable:278:10)
+      at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+    length: 126,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '185',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3647',
+    routine: 'errorMissingColumn',
+    sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:47:14.163 +00:00';`,
+    parameters: undefined
+  },
+  sql: `SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:47:14.163 +00:00';`,
+  parameters: {}
+}

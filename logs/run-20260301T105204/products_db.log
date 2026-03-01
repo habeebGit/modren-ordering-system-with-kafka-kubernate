@@ -1,0 +1,100 @@
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/postgresql/data ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... Etc/UTC
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+
+Success. You can now start the database server using:
+
+    pg_ctl -D /var/lib/postgresql/data -l logfile start
+
+initdb: warning: enabling "trust" authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+waiting for server to start....2026-03-01 16:13:05.845 UTC [46] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-03-01 16:13:05.846 UTC [46] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-03-01 16:13:05.856 UTC [47] LOG:  database system was shut down at 2026-03-01 16:13:05 UTC
+2026-03-01 16:13:05.860 UTC [46] LOG:  database system is ready to accept connections
+ done
+server started
+CREATE DATABASE
+
+
+/usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+
+waiting for server to shut down....2026-03-01 16:13:06.186 UTC [46] LOG:  received fast shutdown request
+2026-03-01 16:13:06.187 UTC [46] LOG:  aborting any active transactions
+2026-03-01 16:13:06.192 UTC [46] LOG:  background worker "logical replication launcher" (PID 53) exited with exit code 1
+2026-03-01 16:13:06.192 UTC [48] LOG:  shutting down
+2026-03-01 16:13:06.207 UTC [46] LOG:  database system is shut down
+ done
+server stopped
+
+PostgreSQL init process complete; ready for start up.
+
+2026-03-01 16:13:06.311 UTC [1] LOG:  starting PostgreSQL 14.21 (Debian 14.21-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-03-01 16:13:06.311 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-03-01 16:13:06.311 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-03-01 16:13:06.314 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-03-01 16:13:06.318 UTC [61] LOG:  database system was shut down at 2026-03-01 16:13:06 UTC
+2026-03-01 16:13:06.322 UTC [1] LOG:  database system is ready to accept connections
+2026-03-01 16:13:28.758 UTC [77] ERROR:  relation "products" does not exist
+2026-03-01 16:13:28.758 UTC [77] STATEMENT:  ALTER TABLE products
+	        ADD COLUMN IF NOT EXISTS reserved_stock INTEGER NOT NULL DEFAULT 0,
+	        ADD COLUMN IF NOT EXISTS price DOUBLE PRECISION NOT NULL DEFAULT 0,
+	        ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+	        ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now();
+2026-03-01 16:14:19.366 UTC [96] ERROR:  relation "products" does not exist at character 139
+2026-03-01 16:14:19.366 UTC [96] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-03-01 16:14:19.374 UTC [96] ERROR:  relation "products" does not exist at character 139
+2026-03-01 16:14:19.374 UTC [96] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-03-01 16:16:02.331 UTC [123] ERROR:  relation "products" does not exist at character 139
+2026-03-01 16:16:02.331 UTC [123] STATEMENT:  SELECT "id", "name", "price", "stock", "reserved_stock" AS "reservedStock", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "products" AS "Product";
+2026-03-01 16:17:32.951 UTC [159] ERROR:  relation "products" does not exist
+2026-03-01 16:17:32.951 UTC [159] STATEMENT:  ALTER TABLE products
+	        ADD COLUMN IF NOT EXISTS reserved_stock INTEGER NOT NULL DEFAULT 0,
+	        ADD COLUMN IF NOT EXISTS price DOUBLE PRECISION NOT NULL DEFAULT 0,
+	        ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+	        ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now();
+2026-03-01 16:17:32.957 UTC [159] LOG:  could not receive data from client: Connection reset by peer
+2026-03-01 16:18:29.312 UTC [178] ERROR:  relation "products" does not exist at character 733
+2026-03-01 16:18:29.312 UTC [178] STATEMENT:  SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:18:29.284 +00:00';
+2026-03-01 16:23:29.312 UTC [270] ERROR:  relation "products" does not exist at character 733
+2026-03-01 16:23:29.312 UTC [270] STATEMENT:  SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:23:29.286 +00:00';
+2026-03-01 16:25:29.330 UTC [308] ERROR:  relation "products" does not exist
+2026-03-01 16:25:29.330 UTC [308] STATEMENT:  ALTER TABLE products
+	        ADD COLUMN IF NOT EXISTS reserved_stock INTEGER NOT NULL DEFAULT 0,
+	        ADD COLUMN IF NOT EXISTS price DOUBLE PRECISION NOT NULL DEFAULT 0,
+	        ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+	        ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now();
+2026-03-01 16:25:29.335 UTC [308] LOG:  could not receive data from client: Connection reset by peer
+2026-03-01 16:28:29.311 UTC [362] ERROR:  relation "products" does not exist at character 733
+2026-03-01 16:28:29.311 UTC [362] STATEMENT:  SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:28:29.286 +00:00';
+2026-03-01 16:29:58.201 UTC [391] ERROR:  relation "products" does not exist
+2026-03-01 16:29:58.201 UTC [391] STATEMENT:  ALTER TABLE products
+	        ADD COLUMN IF NOT EXISTS reserved_stock INTEGER NOT NULL DEFAULT 0,
+	        ADD COLUMN IF NOT EXISTS price DOUBLE PRECISION NOT NULL DEFAULT 0,
+	        ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+	        ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now();
+2026-03-01 16:29:58.206 UTC [391] LOG:  could not receive data from client: Connection reset by peer
+2026-03-01 16:37:14.184 UTC [557] ERROR:  column StockReservation.expires_at does not exist at character 185
+2026-03-01 16:37:14.184 UTC [557] STATEMENT:  SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:37:14.159 +00:00';
+2026-03-01 16:42:14.179 UTC [648] ERROR:  column StockReservation.expires_at does not exist at character 185
+2026-03-01 16:42:14.179 UTC [648] STATEMENT:  SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:42:14.163 +00:00';
+2026-03-01 16:47:14.180 UTC [750] ERROR:  column StockReservation.expires_at does not exist at character 185
+2026-03-01 16:47:14.180 UTC [750] STATEMENT:  SELECT "StockReservation"."id", "StockReservation"."order_id" AS "orderId", "StockReservation"."product_id" AS "productId", "StockReservation"."quantity", "StockReservation"."status", "StockReservation"."expires_at" AS "expiresAt", "StockReservation"."created_at" AS "createdAt", "StockReservation"."updated_at" AS "updatedAt", "StockReservation"."product_id" AS "ProductId", "Product"."id" AS "Product.id", "Product"."name" AS "Product.name", "Product"."price" AS "Product.price", "Product"."stock" AS "Product.stock", "Product"."reserved_stock" AS "Product.reservedStock", "Product"."created_at" AS "Product.createdAt", "Product"."updated_at" AS "Product.updatedAt" FROM "stock_reservations" AS "StockReservation" LEFT OUTER JOIN "products" AS "Product" ON "StockReservation"."product_id" = "Product"."id" WHERE "StockReservation"."status" = 'RESERVED' AND "StockReservation"."expires_at" < '2026-03-01 16:47:14.163 +00:00';

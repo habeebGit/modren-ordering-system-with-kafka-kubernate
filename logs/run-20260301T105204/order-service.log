@@ -1,0 +1,653 @@
+Running migrations for order-service...
+
+Sequelize CLI [Node: 18.20.8, CLI: 6.6.5, ORM: 6.37.7]
+
+Loaded configuration file "sequelize-config.js".
+Using environment "production".
+== 20260226-add-stock-reservations: migrating =======
+== 20260226-add-stock-reservations: migrated (0.019s)
+
+== 20260226-alter-products-add-columns: migrating =======
+
+
+ERROR: relation "products" does not exist
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.11.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.11.0
+npm notice To update run: npm install -g npm@11.11.0
+npm notice
+[dotenv@17.3.1] injecting env (8) from .env -- tip: ⚙️  override existing env vars with { override: true }
+{"level":"WARN","timestamp":"2026-03-01T16:13:29.133Z","logger":"kafkajs","message":"KafkaJS v2.0.0 switched default partitioner. To retain the same partitioning behavior as in previous versions, create the producer with the option \"createPartitioner: Partitioners.LegacyPartitioner\". See the migration guide at https://kafka.js.org/docs/migration-guide-v2.0.0#producer-new-default-partitioner for details. Silence this warning by setting the environment variable \"KAFKAJS_NO_PARTITIONER_WARNING=1\""}
+Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'Orders'
+Executing (default): CREATE TABLE IF NOT EXISTS "Orders" ("id"   SERIAL , "userId" INTEGER NOT NULL, "status" VARCHAR(255) DEFAULT 'Pending', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL, "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY ("id"));
+Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'Orders' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'OrderItems'
+Executing (default): CREATE TABLE IF NOT EXISTS "OrderItems" ("id"   SERIAL , "productId" INTEGER NOT NULL, "quantity" INTEGER NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL, "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL, "OrderId" INTEGER REFERENCES "Orders" ("id") ON DELETE SET NULL ON UPDATE CASCADE, PRIMARY KEY ("id"));
+Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'OrderItems' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'ProcessedEvents'
+Executing (default): CREATE TABLE IF NOT EXISTS "ProcessedEvents" ("id" VARCHAR(255) , "eventType" VARCHAR(255) NOT NULL, "processedAt" TIMESTAMP WITH TIME ZONE NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL, "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY ("id"));
+Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'ProcessedEvents' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'DeadLetterEvents'
+Executing (default): CREATE TABLE IF NOT EXISTS "DeadLetterEvents" ("id" VARCHAR(255) , "eventType" VARCHAR(255), "payload" JSON, "errorMessage" TEXT, "createdAt" TIMESTAMP WITH TIME ZONE, "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY ("id"));
+Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'DeadLetterEvents' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+{"level":"info","message":"Kafka producer connected","timestamp":"2026-03-01T16:13:29.242Z"}
+Server is running on port 3001
+{"level":"ERROR","timestamp":"2026-03-01T16:13:29.395Z","logger":"kafkajs","message":"[Connection] Response Metadata(key: 3, version: 6)","broker":"kafka:9092","clientId":"kafkajs","error":"There is no leader for this topic-partition as we are in the middle of a leadership election","correlationId":1,"size":82}
+{"level":"INFO","timestamp":"2026-03-01T16:13:29.752Z","logger":"kafkajs","message":"[Consumer] Starting","groupId":"order-service-group"}
+{"level":"ERROR","timestamp":"2026-03-01T16:13:29.815Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":3,"size":55}
+{"level":"ERROR","timestamp":"2026-03-01T16:13:30.327Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":4,"size":55}
+{"level":"ERROR","timestamp":"2026-03-01T16:13:31.180Z","logger":"kafkajs","message":"[Connection] Response GroupCoordinator(key: 10, version: 2)","broker":"kafka:9092","clientId":"kafkajs","error":"The group coordinator is not available","correlationId":5,"size":55}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:13:32.549Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:13:32 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:13:32.552Z"}
+{"level":"INFO","timestamp":"2026-03-01T16:13:32.594Z","logger":"kafkajs","message":"[ConsumerGroup] Consumer has joined the group","groupId":"order-service-group","memberId":"kafkajs-79d1721e-7762-450b-af03-e56dac9a2fcb","leaderId":"kafkajs-79d1721e-7762-450b-af03-e56dac9a2fcb","isLeader":true,"memberAssignment":{"order-events":[0]},"groupProtocol":"RoundRobinAssigner","duration":2841}
+{"level":"info","message":"Kafka consumer started","timestamp":"2026-03-01T16:13:32.595Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:13:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:13:37.801Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:13:42.687Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:13:42 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:13:42.688Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:13:52.773Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:13:52 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:13:52.774Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:13:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:13:52.793Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:14:03.017Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:14:03 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:14:03.025Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:14:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:14:07.798Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:14:13.124Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:14:13 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:14:13.125Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:14:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:14:22.802Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:14:23.238Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:14:23 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:14:23.240Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:14:33.385Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:14:33 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:14:33.390Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:14:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:14:37.798Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:14:43.474Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:14:43 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:14:43.475Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:14:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:14:52.798Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:14:53.550Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:14:53 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:14:53.551Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:15:03.713Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:15:03 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:15:03.718Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:15:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:15:07.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:15:13.838Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:15:13 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:15:13.840Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:15:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:15:22.802Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:15:24.015Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:15:24 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:15:24.017Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:15:34.128Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:15:34 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:15:34.130Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:15:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:15:37.803Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:15:44.239Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:15:44 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:15:44.240Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:15:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:15:52.813Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:15:54.359Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:15:54 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:15:54.361Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:16:04.504Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:16:04 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:16:04.505Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:16:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:16:07.797Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:16:14.616Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:16:14 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:16:14.618Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:16:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:16:22.798Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:16:24.733Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:16:24 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:16:24.735Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:16:34.848Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:16:34 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:16:34.849Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:16:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:16:37.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:16:44.971Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:16:44 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:16:44.973Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:16:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:16:52.806Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:16:55.064Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:16:55 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:16:55.065Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:17:05.185Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:17:05 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:17:05.187Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:17:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:17:07.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:17:15.278Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:17:15 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:17:15.279Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:17:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:17:22.796Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:17:25.461Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:17:25 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:17:25.463Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:17:35.582Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:17:35 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:17:35.584Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:17:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:17:37.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:17:45.652Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:17:45 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:17:45.653Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:17:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:17:52.805Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:17:55.746Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:17:55 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:17:55.747Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:18:05.900Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:18:05 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:18:05.902Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:18:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:18:07.802Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:18:15.987Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:18:15 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:18:15.988Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:18:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:18:22.805Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:18:26.118Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:18:26 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:18:26.126Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:18:36.250Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:18:36 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:18:36.253Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:18:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:18:37.798Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:18:46.363Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:18:46 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:18:46.365Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:18:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:18:52.800Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:18:56.451Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:18:56 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:18:56.452Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:19:06.557Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:19:06 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:19:06.559Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:19:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:19:07.804Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:19:16.648Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:19:16 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:19:16.649Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:19:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:19:22.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:19:26.748Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:19:26 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:19:26.750Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:19:36.851Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:19:36 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:19:36.854Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:19:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:19:37.802Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:19:46.937Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:19:46 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:19:46.938Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:19:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:19:52.804Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:19:57.021Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:19:57 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:19:57.021Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:20:07.144Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:20:07 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:20:07.146Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:20:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:20:07.799Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:20:17.248Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:20:17 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:20:17.249Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:20:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:20:22.796Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:20:27.327Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:20:27 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:20:27.327Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:20:37.447Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:20:37 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:20:37.449Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:20:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:20:37.795Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:20:47.540Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:20:47 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:20:47.541Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:20:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:20:52.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:20:57.648Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:20:57 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:20:57.649Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:21:07.744Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:21:07 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:21:07.748Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:21:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:21:07.798Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:21:17.956Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:21:17 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:21:17.957Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:21:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:21:22.809Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:21:28.047Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:21:28 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:21:28.048Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:21:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:21:37.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:21:38.151Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:21:38 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:21:38.152Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:21:48.272Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:21:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:21:48.275Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:21:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:21:52.800Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:21:58.370Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:21:58 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:21:58.372Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:22:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:22:07.804Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:22:08.482Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:22:08 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:22:08.483Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:22:18.590Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:22:18 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:22:18.592Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:22:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:22:22.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:22:28.673Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:22:28 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:22:28.674Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:22:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:22:37.798Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:22:38.770Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:22:38 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:22:38.771Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:22:48.953Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:22:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:22:48.961Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:22:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:22:52.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:22:59.075Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:22:59 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:22:59.076Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:23:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:23:07.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:23:09.194Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:23:09 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:23:09.195Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:23:19.292Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:23:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:23:19.295Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:23:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:23:22.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:23:29.371Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:23:29 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:23:29.371Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:23:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:23:37.796Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:23:39.459Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:23:39 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:23:39.460Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:23:49.544Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:23:49 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:23:49.544Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:23:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:23:52.815Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:23:59.654Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:23:59 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:23:59.655Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:24:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:24:07.809Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:24:09.825Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:24:09 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:24:09.828Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:24:19.901Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:24:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:24:19.902Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:24:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:24:22.813Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:24:30.010Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:24:30 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:24:30.011Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:24:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:24:37.819Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:24:40.142Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:24:40 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:24:40.144Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:24:50.331Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:24:50 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:24:50.334Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:24:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:24:52.806Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:25:00.599Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:25:00 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:25:00.607Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:25:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:25:07.799Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:25:10.763Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:25:10 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:25:10.764Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:25:20.939Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:25:20 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:25:20.944Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:25:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:25:22.800Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:25:31.037Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:25:31 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:25:31.038Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:25:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:25:37.803Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:25:41.139Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:25:41 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:25:41.141Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:25:51.256Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:25:51 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:25:51.258Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:25:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:25:52.806Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:26:01.342Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:26:01 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:26:01.342Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:26:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:26:07.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:26:11.465Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:26:11 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:26:11.466Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:26:21.555Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:26:21 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:26:21.556Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:26:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:26:22.801Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:26:31.654Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:26:31 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:26:31.655Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:26:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:26:37.804Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:26:41.733Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:26:41 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:26:41.733Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:26:51.876Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:26:51 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:26:51.877Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:26:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:26:52.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:27:01.962Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:27:01 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:27:01.963Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:27:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:27:07.801Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:27:12.115Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:27:12 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:27:12.124Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:27:22.285Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:27:22 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:27:22.289Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:27:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:27:22.801Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:27:32.394Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:27:32 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:27:32.396Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:27:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:27:37.813Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:27:42.487Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:27:42 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:27:42.488Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:27:52.618Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:27:52 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:27:52.620Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:27:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:27:52.798Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:28:03.897Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:28:03 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:28:03.926Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:28:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:28:07.815Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:28:14.050Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:28:14 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:28:14.055Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:28:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:28:22.815Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:28:24.178Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:28:24 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:28:24.179Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:28:34.253Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:28:34 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:28:34.254Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:28:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:28:37.799Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:28:44.403Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:28:44 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:28:44.409Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:28:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:28:52.809Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:28:54.538Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:28:54 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:28:54.539Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:29:04.632Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:29:04 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:29:04.633Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:29:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:29:07.806Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:29:14.730Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:29:14 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:29:14.731Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:29:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:29:22.811Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:29:25.047Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:29:25 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:29:25.048Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:29:35.190Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:29:35 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:29:35.192Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:29:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:29:37.833Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:29:45.305Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:29:45 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:29:45.307Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:29:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:29:52.794Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:29:55.387Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:29:55 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:29:55.387Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:30:05.484Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:30:05 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:30:05.487Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:30:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:30:07.800Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:30:15.603Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:30:15 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:30:15.604Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:30:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:30:22.898Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:30:25.715Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:30:25 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:30:25.716Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:30:35.858Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:30:35 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:30:35.859Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:30:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:30:37.803Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:30:45.986Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:30:45 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:30:45.989Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:30:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:30:52.809Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:30:56.139Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:30:56 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:30:56.140Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:31:06.252Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:31:06 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:31:06.256Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:31:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:31:07.811Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:31:16.368Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:31:16 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:31:16.371Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:31:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:31:22.812Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:31:26.441Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:31:26 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:31:26.441Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:31:36.554Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:31:36 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:31:36.555Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:31:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:31:37.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:31:46.648Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:31:46 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:31:46.650Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:31:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:31:52.805Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:31:56.745Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:31:56 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:31:56.747Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:32:06.918Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:32:06 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:32:06.922Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:32:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:32:07.802Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:32:17.055Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:32:17 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:32:17.058Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:32:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:32:22.813Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:32:27.168Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:32:27 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:32:27.169Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:32:37.246Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:32:37 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:32:37.246Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:32:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:32:37.799Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:32:47.337Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:32:47 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:32:47.338Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:32:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:32:52.805Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:32:57.414Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:32:57 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:32:57.414Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:33:07.535Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:33:07 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:33:07.538Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:33:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:33:07.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:33:17.621Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:33:17 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:33:17.626Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:33:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:33:22.824Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:33:27.756Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:33:27 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:33:27.757Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:33:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:33:37.818Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:33:37.894Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:33:37 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:33:37.895Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:33:48.011Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:33:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:33:48.012Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:33:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:33:52.812Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:33:58.127Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:33:58 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:33:58.128Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:34:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:34:07.819Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:34:08.262Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:34:08 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:34:08.263Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:34:18.374Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:34:18 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:34:18.377Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:34:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:34:22.809Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:34:28.568Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:34:28 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:34:28.570Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:34:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:34:37.812Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:34:38.661Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:34:38 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:34:38.662Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:34:48.768Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:34:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:34:48.769Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:34:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:34:52.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:34:58.862Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:34:58 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:34:58.863Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:35:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:35:07.805Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:35:08.975Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:35:08 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:35:08.978Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:35:19.097Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:35:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:35:19.099Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:35:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:35:22.812Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:35:29.178Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:35:29 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:35:29.178Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:35:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:35:37.824Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:35:39.388Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:35:39 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:35:39.390Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:35:49.494Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:35:49 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:35:49.496Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:35:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:35:52.818Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:35:59.591Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:35:59 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:35:59.592Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:36:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:36:07.817Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:36:09.707Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:36:09 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:36:09.708Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:36:19.792Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:36:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:36:19.792Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:36:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:36:22.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:36:29.879Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:36:29 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:36:29.880Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:36:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:36:37.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:36:39.958Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:36:39 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:36:39.959Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:36:50.110Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:36:50 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:36:50.112Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:36:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:36:52.821Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:37:00.303Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:37:00 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:37:00.306Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:37:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:37:07.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:37:10.394Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:37:10 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:37:10.395Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:37:20.499Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:37:20 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:37:20.501Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:37:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:37:22.799Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:37:30.599Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:37:30 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:37:30.601Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:37:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:37:37.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:37:40.684Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:37:40 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:37:40.685Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:37:50.766Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:37:50 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:37:50.767Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:37:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:37:52.814Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:38:00.880Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:38:00 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:38:00.882Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:38:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:38:07.843Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:38:11.565Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:38:11 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:38:11.573Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:38:21.718Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:38:21 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:38:21.720Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:38:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:38:22.816Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:38:31.821Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:38:31 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:38:31.822Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:38:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:38:37.829Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:38:41.949Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:38:41 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:38:41.951Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:38:52.089Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:38:52 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:38:52.091Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:38:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:38:52.821Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:39:02.283Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:39:02 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:39:02.285Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:39:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:39:07.818Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:39:12.389Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:39:12 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:39:12.390Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:39:22.520Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:39:22 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:39:22.523Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:39:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:39:22.815Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:39:32.621Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:39:32 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:39:32.621Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:39:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:39:37.822Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:39:42.754Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:39:42 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:39:42.756Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:39:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:39:52.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:39:52.940Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:39:52 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:39:52.941Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:40:03.075Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:40:03 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:40:03.077Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:40:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:40:07.806Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:40:13.194Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:40:13 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:40:13.196Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:40:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:40:22.821Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:40:23.327Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:40:23 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:40:23.328Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:40:33.422Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:40:33 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:40:33.423Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:40:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:40:37.818Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:40:43.595Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:40:43 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:40:43.597Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:40:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:40:52.812Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:40:53.741Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:40:53 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:40:53.743Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:41:03.912Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:41:03 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:41:03.923Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:41:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:41:07.817Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:41:14.054Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:41:14 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:41:14.055Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:41:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:41:22.805Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:41:24.180Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:41:24 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:41:24.181Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:41:34.280Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:41:34 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:41:34.281Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:41:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:41:37.796Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:41:44.423Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:41:44 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:41:44.424Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:41:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:41:52.809Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:41:54.538Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:41:54 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:41:54.539Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:42:04.637Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:42:04 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:42:04.638Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:42:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:42:07.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:42:14.731Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:42:14 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:42:14.732Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:42:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:42:22.811Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:42:24.870Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:42:24 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:42:24.873Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:42:34.952Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:42:34 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:42:34.953Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:42:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:42:37.801Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:42:45.033Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:42:45 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:42:45.034Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:42:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:42:52.811Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:42:55.137Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:42:55 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:42:55.138Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:43:05.246Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:43:05 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:43:05.249Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:43:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:43:07.812Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:43:15.341Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:43:15 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:43:15.342Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:43:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:43:22.803Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:43:25.425Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:43:25 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:43:25.426Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:43:35.663Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:43:35 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:43:35.668Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:43:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:43:37.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:43:45.765Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:43:45 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:43:45.765Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:43:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:43:52.817Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:43:55.863Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:43:55 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:43:55.864Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:44:05.940Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:44:05 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:44:05.940Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:44:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:44:07.804Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:44:16.043Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:44:16 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:44:16.044Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:44:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:44:22.811Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:44:26.150Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:44:26 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:44:26.150Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:44:36.240Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:44:36 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:44:36.241Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:44:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:44:37.814Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:44:46.332Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:44:46 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:44:46.332Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:44:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:44:52.805Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:44:56.410Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:44:56 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:44:56.410Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:45:06.518Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:45:06 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:45:06.520Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:45:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:45:07.811Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:45:16.627Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:45:16 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:45:16.628Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:45:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:45:22.803Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:45:26.713Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:45:26 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:45:26.713Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:45:36.809Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:45:36 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:45:36.810Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:45:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:45:37.806Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:45:47.019Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:45:47 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:45:47.022Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:45:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:45:52.820Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:45:57.191Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:45:57 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:45:57.195Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:46:07.298Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:46:07 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:46:07.300Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:46:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:46:07.816Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:46:17.382Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:46:17 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:46:17.383Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:46:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:46:22.809Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:46:27.473Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:46:27 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:46:27.474Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:46:37.559Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:46:37 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:46:37.560Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:46:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:46:37.811Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:46:47.683Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:46:47 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:46:47.685Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:46:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:46:52.805Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:46:57.789Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:46:57 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:46:57.790Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:47:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:47:07.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:47:07.902Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:47:07 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:47:07.903Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:47:17.992Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:47:17 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:47:17.992Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:47:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:47:22.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:47:28.084Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:47:28 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:47:28.085Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:47:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:47:37.819Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:47:38.217Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:47:38 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:47:38.218Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:47:48.298Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:47:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:47:48.299Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:47:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:47:52.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:47:58.400Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:47:58 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:47:58.402Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:48:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:48:07.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:48:08.503Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:48:08 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:48:08.504Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:48:18.592Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:48:18 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:48:18.592Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:48:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:48:22.810Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:48:28.680Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:48:28 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:48:28.681Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:48:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:48:37.803Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:48:38.787Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:48:38 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:48:38.790Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:48:48.870Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:48:48 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:48:48.871Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:48:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:48:52.801Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:48:58.956Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:48:58 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:48:58.957Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:49:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:49:07.818Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:49:09.074Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:49:09 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:49:09.075Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:49:19.154Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:49:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:49:19.154Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:49:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:49:22.823Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:49:29.295Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:49:29 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:49:29.297Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:49:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:49:37.823Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:49:39.380Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:49:39 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:49:39.380Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:49:49.469Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:49:49 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:49:49.470Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:49:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:49:52.808Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:49:59.550Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:49:59 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:49:59.550Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:50:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:50:07.818Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:50:09.632Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:50:09 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:50:09.634Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:50:19.728Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:50:19 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:50:19.728Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:50:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:50:22.804Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:50:29.831Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:50:29 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:50:29.832Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:50:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:50:37.807Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:50:40.045Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:50:40 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:50:40.053Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:50:50.162Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:50:50 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:50:50.165Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:50:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:50:52.820Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:51:00.396Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:51:00 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:51:00.398Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:51:07 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:51:07.820Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:51:10.525Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:51:10 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:51:10.526Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:51:20.816Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:51:20 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:51:20.820Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:51:22 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:51:22.818Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:51:31.430Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:51:31 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:51:31.447Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:51:37 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:51:37.818Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:51:41.571Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:51:41 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:51:41.572Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:51:51.655Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:51:51 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:51:51.656Z"}
+{"level":"info","message":"::ffff:172.18.0.3 - - [01/Mar/2026:16:51:52 +0000] \"GET /metrics HTTP/1.1\" 200 - \"-\" \"Prometheus/3.7.1\"","timestamp":"2026-03-01T16:51:52.812Z"}
+{"level":"info","message":"Health check requested","timestamp":"2026-03-01T16:52:01.765Z"}
+{"level":"info","message":"::1 - - [01/Mar/2026:16:52:01 +0000] \"GET /health HTTP/1.1\" 200 15 \"-\" \"-\"","timestamp":"2026-03-01T16:52:01.768Z"}
